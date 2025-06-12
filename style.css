@@ -387,9 +387,6 @@ body {
 .profile-tooltip {
   display: none;
   position: absolute;
-  bottom: 110%;
-  left: 50%;
-  transform: translateX(-50%);
   background: #ffffff;
   color: #000000;
   font-family: "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New",
@@ -402,6 +399,8 @@ body {
   text-align: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   z-index: 5;
+  min-width: 100px;
+  max-width: 200px;
 }
 
 .profile-item:hover .profile-tooltip {

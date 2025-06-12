@@ -5,7 +5,7 @@ const sentences = [
   "Your work has inspired so much of my own.",
   "Plus I pass by your offices all the time. It looks cool in there.",
   "No, I'm not stalking you.",
-  "I'm stalking the skaters.",
+  "I'm stalking the <img:assets/mschf-board-nobg.png> skaters.",
   "...gd I wish I could skate.",
   "What I'm trying to say is:",
   "you project a desirable workplace, but list no jobs!",
@@ -62,8 +62,35 @@ const secondChatMessages = [
   },
 ];
 
-// Flag to indicate whether we've transitioned to the second chat yet
-let secondChatLoaded = false;
+// Merge the two chat sets into a single ordered feed and set up grid trigger helpers
+chatMessages.push(...secondChatMessages);
+const PLACEHOLDER_TRIGGER_TEXT = "placeholder text";
+const placeholderIndex = chatMessages.findIndex(
+  (msg) => msg.text === PLACEHOLDER_TRIGGER_TEXT
+);
+let gridShown = false;
+function hideProfileGrid() {
+  const grid = document.getElementById("profile-grid");
+  if (grid) {
+    grid.style.display = "none";
+  }
+}
+
+// Helper to always keep the latest chat content in view
+function ensureChatInView() {
+  if (chatContainer) {
+    console.log(
+      "ensureChatInView called - scrollHeight:",
+      chatContainer.scrollHeight,
+      "scrollTop before:",
+      chatContainer.scrollTop
+    );
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    console.log("scrollTop after:", chatContainer.scrollTop);
+  } else {
+    console.log("ensureChatInView called but chatContainer is null");
+  }
+}
 
 // ! Chat Variables
 let chatMode = false;
@@ -78,7 +105,6 @@ let i = 0;
 let isTyping = false;
 let video = document.getElementById("screensaver-video");
 let passbyVideo = document.getElementById("passby-video");
-let skateboardContainer = document.getElementById("skateboard-container");
 chatContainer = document.getElementById("chat-container");
 chatMessagesContainer = document.getElementById("chat-messages");
 let bounceInterval = null;
@@ -104,10 +130,40 @@ let passbyBounceState = {
 // ! Main Typing Functions
 function type() {
   if (i < sentences[currentSentenceIndex].length) {
-    typedText.textContent += sentences[currentSentenceIndex][i++];
+    const currentText = sentences[currentSentenceIndex];
+
+    // Check if we're at the start of an image tag
+    if (currentText.substring(i).startsWith("<img:")) {
+      // Find the end of the image tag
+      const endIndex = currentText.indexOf(">", i);
+      if (endIndex !== -1) {
+        // Extract the image path
+        const imagePath = currentText.substring(i + 5, endIndex); // +5 to skip '<img:'
+
+        // Create and insert the image element
+        const img = document.createElement("img");
+        img.src = imagePath;
+        img.style.cssText =
+          "height: 10em; width: auto; vertical-align: middle; margin: 0 2px;";
+        img.alt = "skateboard";
+        typedText.appendChild(img);
+
+        // Skip past the entire image tag
+        i = endIndex + 1;
+
+        // Continue typing after a brief pause
+        setTimeout(type, 100);
+        return;
+      }
+    }
+
+    // Normal character typing
+    const textNode = document.createTextNode(
+      sentences[currentSentenceIndex][i++]
+    );
+    typedText.appendChild(textNode);
 
     // Check if we just typed a period followed by a space (sentence ending)
-    const currentText = sentences[currentSentenceIndex];
     const justTyped = currentText[i - 1];
     const nextChar = currentText[i];
 
@@ -126,7 +182,7 @@ function type() {
 function startTyping() {
   if (isTyping) return;
   isTyping = true;
-  typedText.textContent = "";
+  typedText.innerHTML = "";
   i = 0;
   type();
   // Show screensaver if on third or fourth sentence
@@ -144,16 +200,9 @@ function startTyping() {
     if (passbyVideo.style.display !== "block") {
       showPassbyScreensaver();
     }
-    hideSkateboardAnimation();
-  } else if (currentSentenceIndex === 6) {
-    // Show skateboard animation on the skating sentence
-    hideScreensaver();
-    hidePassbyScreensaver();
-    showSkateboardAnimation();
   } else {
     hideScreensaver();
     hidePassbyScreensaver();
-    hideSkateboardAnimation();
   }
 }
 
@@ -433,39 +482,14 @@ function moveVideo() {
   }
 }
 
-// ! Skateboard Animation Functions
-function showSkateboardAnimation() {
-  if (!skateboardContainer) return;
-
-  // Reset position and show
-  skateboardContainer.style.display = "block";
-  skateboardContainer.classList.remove("skateboard-animate");
-
-  // Force a reflow to ensure the reset takes effect
-  skateboardContainer.offsetHeight;
-
-  // Start the animation
-  skateboardContainer.classList.add("skateboard-animate");
-
-  // Hide after animation completes
-  setTimeout(() => {
-    hideSkateboardAnimation();
-  }, 4000);
-}
-
-function hideSkateboardAnimation() {
-  if (!skateboardContainer) return;
-  skateboardContainer.style.display = "none";
-  skateboardContainer.classList.remove("skateboard-animate");
-}
-
 // ! Chat Functions
 function transitionToChat() {
   // Hide all terminal elements
   document.body.classList.add("chat-active");
   hideScreensaver();
   hidePassbyScreensaver();
-  hideSkateboardAnimation();
+  hideProfileGrid();
+  gridShown = false;
 
   // Show chat container
   if (chatContainer) {
@@ -532,16 +556,34 @@ function startChatMessage() {
   if (currentChatIndex >= chatMessages.length) return;
 
   const message = chatMessages[currentChatIndex];
+  console.log(
+    "startChatMessage - index:",
+    currentChatIndex,
+    "message:",
+    message
+  );
   const messageElement = createChatMessage(message);
 
   if (chatMessagesContainer) {
     chatMessagesContainer.appendChild(messageElement);
+    console.log("Message appended, calling ensureChatInView");
+    // Always keep the latest message in view
+    ensureChatInView();
+  }
+
+  // Trigger the grid when the placeholder message is reached
+  if (!gridShown && message.text === PLACEHOLDER_TRIGGER_TEXT) {
+    console.log("Triggering profile grid for placeholder message");
+    loadProfileGrid();
+    gridShown = true;
   }
 
   // Start typing the message or show video
   if (message.type === "video") {
+    console.log("Showing video for message index:", currentChatIndex);
     showChatVideo(currentChatIndex);
   } else {
+    console.log("Starting to type message:", message.text);
     typeChatMessage(message.text, currentChatIndex);
   }
 }
@@ -549,18 +591,28 @@ function startChatMessage() {
 function typeChatMessage(text, messageIndex) {
   const textElement = document.getElementById(`chat-text-${messageIndex}`);
 
-  if (!textElement) return;
+  if (!textElement) {
+    console.log(
+      "typeChatMessage - textElement not found for index:",
+      messageIndex
+    );
+    return;
+  }
 
   let charIndex = 0;
   isTyping = true;
+  console.log("Starting to type message:", text);
 
   function typeChar() {
     if (charIndex < text.length) {
       textElement.textContent += text[charIndex];
       charIndex++;
+      ensureChatInView();
       setTimeout(typeChar, 40);
     } else {
+      console.log("Finished typing message:", text);
       isTyping = false;
+      ensureChatInView();
     }
   }
 
@@ -570,45 +622,34 @@ function typeChatMessage(text, messageIndex) {
 function showChatVideo(messageIndex) {
   const videoElement = document.getElementById(`chat-video-${messageIndex}`);
   if (videoElement) {
+    console.log("Showing video element for index:", messageIndex);
     videoElement.style.display = "block";
     isTyping = false; // Video shows immediately, no typing animation
+    ensureChatInView();
+  } else {
+    console.log("Video element not found for index:", messageIndex);
   }
 }
 
 function nextChatMessage() {
-  if (isTyping) return;
+  if (isTyping) {
+    console.log("nextChatMessage blocked - still typing");
+    return;
+  }
 
-  // Advance within the current chat set if possible
+  console.log(
+    "nextChatMessage - current index:",
+    currentChatIndex,
+    "total messages:",
+    chatMessages.length
+  );
   if (currentChatIndex < chatMessages.length - 1) {
     currentChatIndex++;
+    console.log("Advancing to message index:", currentChatIndex);
     startChatMessage();
   } else {
-    // We've reached the end of the first chat set, load the second chat once
-    if (!secondChatLoaded) {
-      secondChatLoaded = true;
-      startSecondChat();
-    }
+    console.log("Already at last message");
   }
-}
-
-// Replace the existing chat messages with the second set and start over
-function startSecondChat() {
-  // Clear the existing chat UI
-  if (chatMessagesContainer) {
-    chatMessagesContainer.innerHTML = "";
-  }
-
-  // Mutate the original chatMessages array so existing functions continue to work
-  chatMessages.length = 0;
-  secondChatMessages.forEach((msg) => chatMessages.push(msg));
-
-  currentChatIndex = 0;
-
-  // Show the first message of the new chat set
-  startChatMessage();
-
-  // Trigger the profile grid
-  loadProfileGrid();
 }
 
 // Build and reveal the profile grid using the CSV file
@@ -665,7 +706,6 @@ function loadProfileGrid() {
     });
 }
 
-// Navigate backward in chat. If already at the first message, return to the last sentence screen.
 function previousChatMessage() {
   // If we are not on the first chat message, simply remove the last rendered message and decrement.
   if (currentChatIndex > 0) {
@@ -673,6 +713,13 @@ function previousChatMessage() {
       chatMessagesContainer.removeChild(chatMessagesContainer.lastChild);
     }
     currentChatIndex--;
+
+    // Hide the grid if we've moved before its trigger message
+    if (gridShown && currentChatIndex < placeholderIndex) {
+      hideProfileGrid();
+      gridShown = false;
+    }
+
     // Update debug dropdown selection if present
     if (debugDropdown) {
       debugDropdown.value = "chat";
@@ -690,7 +737,9 @@ function previousChatMessage() {
 
     // Reset chat indices so a fresh chat will start next time we enter.
     currentChatIndex = 0;
-    secondChatLoaded = false;
+
+    hideProfileGrid();
+    gridShown = false;
 
     // Jump to the final sentence and display it.
     currentSentenceIndex = sentences.length - 1;
