@@ -13,6 +13,9 @@ const sentences = [
   "Cuz if you got to know me, I think there's a 2-10% chance you'd hire me.",
 ];
 
+// ! Final Section (after chat)
+const finalSentences = ["Yes. One more thing. I've prepared a song..."];
+
 // ! Names to highlight (New York residents)
 const nyNames = [
   "Lukas Bentel",
@@ -62,7 +65,7 @@ const chatMessages = [
   },
   {
     sender: "js",
-    text: "But I feel like I know everyone here already.",
+    text: "But I found something out — I have a lot in common with y'all.",
     side: "right",
   },
   {
@@ -82,7 +85,7 @@ const chatMessages = [
 const secondChatMessages = [
   {
     sender: "mschf",
-    text: "*checks watch, visibly unsettled*",
+    text: "*visibly unsettled*",
     side: "left",
   },
   {
@@ -107,8 +110,23 @@ const secondChatMessages = [
   },
   {
     sender: "js",
-    text: "A handful",
+    text: "A handful — like this bootleg New York Times game",
     side: "right",
+  },
+  {
+    sender: "js",
+    text: "Or this open source CAPTCHA that reminds everyone to keep your hands off our collective pussies.",
+    side: "right",
+  },
+  {
+    sender: "js",
+    text: "And this Tinder-style game to identify fake news. I'm sorry to say, it won't help you hook up in airplane bathrooms...",
+    side: "right",
+  },
+  {
+    sender: "mschf",
+    text: "Well, this has been sufficiently weird. But thank you. Anything else before we call it?",
+    side: "left",
   },
 ];
 
@@ -122,7 +140,11 @@ const SKILLS_TRIGGER_TEXT =
   "Some of us share the same skills and experience. And, in the case of Johnny Thaw, the same Pornhub handle.";
 const LINKEDIN_TRIGGER_TEXT =
   "And some of us, for worse or for worse, are LinkedIn power users. If you have more than 1,000 connections, you're never alone.";
-const VIDEO_TRIGGER_TEXT = "A handful";
+const VIDEO_TRIGGER_TEXT = "A handful — like this bootleg New York Times game";
+const SECOND_VIDEO_TRIGGER_TEXT =
+  "Or this open source CAPTCHA that reminds everyone to keep your hands off our collective pussies.";
+const THIRD_VIDEO_TRIGGER_TEXT =
+  "And this Tinder-style game to identify fake news. I'm sorry to say, it won't help you hook up in airplane bathrooms...";
 const placeholderIndex = chatMessages.findIndex(
   (msg) => msg.text === PLACEHOLDER_TRIGGER_TEXT
 );
@@ -138,11 +160,19 @@ const linkedinIndex = chatMessages.findIndex(
 const videoIndex = chatMessages.findIndex(
   (msg) => msg.text === VIDEO_TRIGGER_TEXT
 );
+const secondVideoIndex = chatMessages.findIndex(
+  (msg) => msg.text === SECOND_VIDEO_TRIGGER_TEXT
+);
+const thirdVideoIndex = chatMessages.findIndex(
+  (msg) => msg.text === THIRD_VIDEO_TRIGGER_TEXT
+);
 let gridShown = false;
 let highlightShown = false;
 let skillsHighlightShown = false;
 let linkedinHighlightShown = false;
 let videoShown = false;
+let secondVideoShown = false;
+let thirdVideoShown = false;
 let profileElements = []; // Store profile elements for highlighting
 
 function hideProfileGrid() {
@@ -155,10 +185,14 @@ function hideProfileGrid() {
   skillsHighlightShown = false;
   linkedinHighlightShown = false;
   videoShown = false;
+  secondVideoShown = false;
+  thirdVideoShown = false;
   unhighlightNYProfiles();
   unhighlightSkills();
   unhighlightLinkedInProfiles();
   hideVideoContainer();
+  hideSecondVideoContainer();
+  hideThirdVideoContainer();
 }
 
 // Function to highlight NY profiles
@@ -303,6 +337,122 @@ function hideVideoContainer() {
   videoShown = false;
 }
 
+// Function to show second video container
+function showSecondVideoContainer() {
+  if (secondVideoShown) return;
+
+  // Hide the first video container
+  hideVideoContainer();
+
+  // Show the second video container
+  let secondVideoContainer = document.getElementById("c4c-video-container");
+  if (!secondVideoContainer) {
+    // Create the second video container if it doesn't exist
+    secondVideoContainer = document.createElement("div");
+    secondVideoContainer.id = "c4c-video-container";
+    secondVideoContainer.style.cssText = `
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 50vw;
+      height: 100vh;
+      z-index: 1000;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `;
+
+    const video = document.createElement("video");
+    video.src = "assets/captchaheader.mp4";
+    video.controls = true;
+    video.autoplay = true;
+    video.muted = true;
+    video.loop = true;
+    video.style.cssText = `
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    `;
+
+    secondVideoContainer.appendChild(video);
+    document.body.appendChild(secondVideoContainer);
+  } else {
+    secondVideoContainer.style.display = "flex";
+  }
+
+  secondVideoShown = true;
+}
+
+// Function to hide second video container
+function hideSecondVideoContainer() {
+  const secondVideoContainer = document.getElementById("c4c-video-container");
+  if (secondVideoContainer) {
+    secondVideoContainer.style.display = "none";
+  }
+  secondVideoShown = false;
+}
+
+// Function to show third video container
+function showThirdVideoContainer() {
+  if (thirdVideoShown) return;
+
+  // Hide the second video container
+  hideSecondVideoContainer();
+
+  // Show the third video container
+  let thirdVideoContainer = document.getElementById(
+    "fake-news-video-container"
+  );
+  if (!thirdVideoContainer) {
+    // Create the third video container if it doesn't exist
+    thirdVideoContainer = document.createElement("div");
+    thirdVideoContainer.id = "fake-news-video-container";
+    thirdVideoContainer.style.cssText = `
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 50vw;
+      height: 100vh;
+      z-index: 1000;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `;
+
+    const video = document.createElement("video");
+    video.src = "assets/fake-news-clip.mp4";
+    video.controls = true;
+    video.autoplay = true;
+    video.muted = true;
+    video.loop = true;
+    video.style.cssText = `
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    `;
+
+    thirdVideoContainer.appendChild(video);
+    document.body.appendChild(thirdVideoContainer);
+  } else {
+    thirdVideoContainer.style.display = "flex";
+  }
+
+  thirdVideoShown = true;
+}
+
+// Function to hide third video container
+function hideThirdVideoContainer() {
+  const thirdVideoContainer = document.getElementById(
+    "fake-news-video-container"
+  );
+  if (thirdVideoContainer) {
+    thirdVideoContainer.style.display = "none";
+  }
+  thirdVideoShown = false;
+}
+
 // Helper to always keep the latest chat content in view
 function ensureChatInView() {
   if (chatContainer) {
@@ -324,6 +474,10 @@ let chatMode = false;
 let currentChatIndex = 0;
 let chatContainer = null;
 let chatMessagesContainer = null;
+
+// ! Final Section Variables
+let finalMode = false;
+let currentFinalIndex = 0;
 
 // ! Setup and Variables
 const typedText = document.getElementById("typed-text");
@@ -471,6 +625,22 @@ document.addEventListener("keydown", function (event) {
         previousChatMessage();
         break;
     }
+  } else if (finalMode) {
+    // Handle final mode keyboard controls
+    switch (event.key) {
+      case "ArrowRight":
+      case "ArrowDown":
+      case "Enter":
+        event.preventDefault();
+        nextFinalSentence();
+        break;
+      case "ArrowUp":
+      case "ArrowLeft":
+      case "Backspace":
+        event.preventDefault();
+        previousFinalSentence();
+        break;
+    }
   } else {
     // Handle terminal mode keyboard controls
     switch (event.key) {
@@ -546,8 +716,20 @@ function createDebugDropdown() {
     dropdown.appendChild(option);
   });
 
+  // Add options for final section
+  finalSentences.forEach((sentence, index) => {
+    const option = document.createElement("option");
+    option.value = `final-${index}`;
+    option.textContent = `FINAL ${index}: ${sentence.substring(0, 30)}...`;
+    dropdown.appendChild(option);
+  });
+
   // Set initial value
-  dropdown.value = chatMode ? `chat-${currentChatIndex}` : currentSentenceIndex;
+  dropdown.value = finalMode
+    ? `final-${currentFinalIndex}`
+    : chatMode
+    ? `chat-${currentChatIndex}`
+    : currentSentenceIndex;
 
   // Add event listener
   dropdown.addEventListener("change", function (event) {
@@ -560,10 +742,14 @@ function createDebugDropdown() {
       // Jump to specific chat message
       const chatIdx = parseInt(selectedValue.split("-")[1]);
       jumpToChatIndex(chatIdx);
+    } else if (selectedValue.startsWith("final-")) {
+      // Jump to specific final message
+      const finalIdx = parseInt(selectedValue.split("-")[1]);
+      jumpToFinalIndex(finalIdx);
     } else {
       const newIndex = parseInt(selectedValue);
       if (newIndex >= 0 && newIndex < sentences.length) {
-        // Reset to terminal mode if in chat mode
+        // Reset to terminal mode if in chat or final mode
         if (chatMode) {
           chatMode = false;
           document.body.classList.remove("chat-active");
@@ -574,6 +760,10 @@ function createDebugDropdown() {
             chatMessagesContainer.innerHTML = "";
           }
           currentChatIndex = 0;
+        }
+        if (finalMode) {
+          finalMode = false;
+          currentFinalIndex = 0;
         }
         currentSentenceIndex = newIndex;
         startTyping();
@@ -591,6 +781,56 @@ function createDebugDropdown() {
 // Initialize debug dropdown
 const debugDropdown = createDebugDropdown();
 
+// Utility to jump to a specific final index
+function jumpToFinalIndex(targetIndex) {
+  if (
+    typeof targetIndex !== "number" ||
+    targetIndex < 0 ||
+    targetIndex >= finalSentences.length
+  ) {
+    return;
+  }
+
+  // Enter final mode and reset other states
+  document.body.classList.remove("chat-active");
+  hideScreensaver();
+  hidePassbyScreensaver();
+  hideProfileGrid();
+
+  if (chatContainer) {
+    chatContainer.classList.remove("active");
+  }
+  if (chatMessagesContainer) {
+    chatMessagesContainer.innerHTML = "";
+  }
+
+  chatMode = false;
+  finalMode = true;
+  isTyping = false;
+  currentFinalIndex = targetIndex;
+
+  // Display the target sentence immediately
+  typedText.innerHTML = "";
+  if (finalSentences[targetIndex].includes("<img:")) {
+    // Handle images in final sentences
+    let content = finalSentences[targetIndex];
+    let tempDiv = document.createElement("div");
+    tempDiv.innerHTML = content.replace(
+      /<img:([^>]+)>/g,
+      '<img src="$1" style="height: 10em; width: auto; vertical-align: middle; margin: 0 2px;" alt="image">'
+    );
+    while (tempDiv.firstChild) {
+      typedText.appendChild(tempDiv.firstChild);
+    }
+  } else {
+    typedText.textContent = finalSentences[targetIndex];
+  }
+
+  if (debugDropdown) {
+    debugDropdown.value = `final-${currentFinalIndex}`;
+  }
+}
+
 // Update dropdown when sentences change via keyboard
 const originalNextSentence = nextSentence;
 const originalPreviousSentence = previousSentence;
@@ -598,7 +838,9 @@ const originalPreviousSentence = previousSentence;
 nextSentence = function () {
   originalNextSentence();
   if (debugDropdown) {
-    debugDropdown.value = chatMode
+    debugDropdown.value = finalMode
+      ? `final-${currentFinalIndex}`
+      : chatMode
       ? `chat-${currentChatIndex}`
       : currentSentenceIndex;
   }
@@ -607,7 +849,9 @@ nextSentence = function () {
 previousSentence = function () {
   originalPreviousSentence();
   if (debugDropdown) {
-    debugDropdown.value = chatMode
+    debugDropdown.value = finalMode
+      ? `final-${currentFinalIndex}`
+      : chatMode
       ? `chat-${currentChatIndex}`
       : currentSentenceIndex;
   }
@@ -846,6 +1090,18 @@ function startChatMessage() {
     showVideoContainer();
   }
 
+  // Trigger second video container when the second video message is reached
+  if (!secondVideoShown && message.text === SECOND_VIDEO_TRIGGER_TEXT) {
+    console.log("Triggering second video container");
+    showSecondVideoContainer();
+  }
+
+  // Trigger third video container when the third video message is reached
+  if (!thirdVideoShown && message.text === THIRD_VIDEO_TRIGGER_TEXT) {
+    console.log("Triggering third video container");
+    showThirdVideoContainer();
+  }
+
   // Start typing the message or show video
   if (message.type === "video") {
     console.log("Showing video for message index:", currentChatIndex);
@@ -882,14 +1138,42 @@ function typeChatMessage(text, messageIndex) {
     textElement.classList.add("linkedin-highlight-text");
   }
 
+  // Check if the message contains HTML tags
+  const containsHTML = text.includes("<");
+
   let charIndex = 0;
   isTyping = true;
   console.log("Starting to type message:", text);
 
   function typeChar() {
     if (charIndex < text.length) {
-      textElement.textContent += text[charIndex];
-      charIndex++;
+      if (containsHTML) {
+        // For HTML content, we need to type character by character but handle HTML tags
+        let currentChar = text[charIndex];
+
+        // If we hit an opening HTML tag, find the closing tag and add the whole tag at once
+        if (currentChar === "<") {
+          let tagEnd = text.indexOf(">", charIndex);
+          if (tagEnd !== -1) {
+            // Add all characters up to and including the closing >
+            let currentHTML = textElement.innerHTML;
+            let tagContent = text.substring(charIndex, tagEnd + 1);
+            textElement.innerHTML = currentHTML + tagContent;
+            charIndex = tagEnd + 1;
+          } else {
+            // If no closing >, just add the character
+            textElement.innerHTML += currentChar;
+            charIndex++;
+          }
+        } else {
+          // Regular character, add it
+          textElement.innerHTML += currentChar;
+          charIndex++;
+        }
+      } else {
+        textElement.textContent += text[charIndex];
+        charIndex++;
+      }
       ensureChatInView();
       setTimeout(typeChar, 40);
     } else {
@@ -934,7 +1218,8 @@ function nextChatMessage() {
       debugDropdown.value = `chat-${currentChatIndex}`;
     }
   } else {
-    console.log("Already at last message");
+    // Transition to final section after the last chat message
+    transitionToFinal();
   }
 }
 
@@ -1027,6 +1312,24 @@ function previousChatMessage() {
       unhighlightLinkedInProfiles();
     }
 
+    // Hide third video container if we've moved before its trigger message
+    if (thirdVideoShown && currentChatIndex < thirdVideoIndex) {
+      hideThirdVideoContainer();
+      // Show second video again if we're still after its trigger message
+      if (currentChatIndex >= secondVideoIndex) {
+        showSecondVideoContainer();
+      }
+    }
+
+    // Hide second video container if we've moved before its trigger message
+    if (secondVideoShown && currentChatIndex < secondVideoIndex) {
+      hideSecondVideoContainer();
+      // Show first video again if we're still after its trigger message
+      if (currentChatIndex >= videoIndex) {
+        showVideoContainer();
+      }
+    }
+
     // Hide video container if we've moved before its trigger message
     if (videoShown && currentChatIndex < videoIndex) {
       hideVideoContainer();
@@ -1092,10 +1395,14 @@ function jumpToChatIndex(targetIndex) {
   skillsHighlightShown = false;
   linkedinHighlightShown = false;
   videoShown = false;
+  secondVideoShown = false;
+  thirdVideoShown = false;
   unhighlightNYProfiles();
   unhighlightSkills();
   unhighlightLinkedInProfiles();
   hideVideoContainer();
+  hideSecondVideoContainer();
+  hideThirdVideoContainer();
 
   // Show chat container
   if (chatContainer) {
@@ -1136,13 +1443,26 @@ function jumpToChatIndex(targetIndex) {
     if (!videoShown && message.text === VIDEO_TRIGGER_TEXT) {
       showVideoContainer();
     }
+    if (!secondVideoShown && message.text === SECOND_VIDEO_TRIGGER_TEXT) {
+      showSecondVideoContainer();
+    }
+    if (!thirdVideoShown && message.text === THIRD_VIDEO_TRIGGER_TEXT) {
+      showThirdVideoContainer();
+    }
 
     // Populate content instantly (skip typing)
     if (message.type === "video") {
       showChatVideo(idx);
     } else {
       const textEl = document.getElementById(`chat-text-${idx}`);
-      if (textEl) textEl.textContent = message.text;
+      if (textEl) {
+        // Check if the message contains HTML tags
+        if (message.text.includes("<")) {
+          textEl.innerHTML = message.text;
+        } else {
+          textEl.textContent = message.text;
+        }
+      }
     }
   }
 
@@ -1154,6 +1474,130 @@ function jumpToChatIndex(targetIndex) {
 
   if (debugDropdown) {
     debugDropdown.value = `chat-${currentChatIndex}`;
+  }
+}
+
+// ! Final Section Functions
+function transitionToFinal() {
+  // Hide chat elements and show terminal elements
+  document.body.classList.remove("chat-active");
+  hideScreensaver();
+  hidePassbyScreensaver();
+  hideProfileGrid();
+
+  if (chatContainer) {
+    chatContainer.classList.remove("active");
+  }
+
+  chatMode = false;
+  finalMode = true;
+  currentFinalIndex = 0;
+
+  // Update debug dropdown
+  if (debugDropdown) {
+    debugDropdown.value = `final-${currentFinalIndex}`;
+  }
+
+  // Start first final sentence
+  setTimeout(() => {
+    startFinalTyping();
+  }, 500);
+}
+
+function startFinalTyping() {
+  if (isTyping) return;
+  isTyping = true;
+  typedText.innerHTML = "";
+  i = 0;
+  typeFinal();
+}
+
+function typeFinal() {
+  if (i < finalSentences[currentFinalIndex].length) {
+    const currentText = finalSentences[currentFinalIndex];
+
+    // Check if we're at the start of an image tag
+    if (currentText.substring(i).startsWith("<img:")) {
+      // Find the end of the image tag
+      const endIndex = currentText.indexOf(">", i);
+      if (endIndex !== -1) {
+        // Extract the image path
+        const imagePath = currentText.substring(i + 5, endIndex); // +5 to skip '<img:'
+
+        // Create and insert the image element
+        const img = document.createElement("img");
+        img.src = imagePath;
+        img.style.cssText =
+          "height: 10em; width: auto; vertical-align: middle; margin: 0 2px;";
+        img.alt = "image";
+        typedText.appendChild(img);
+
+        // Skip past the entire image tag
+        i = endIndex + 1;
+
+        // Continue typing after a brief pause
+        setTimeout(typeFinal, 100);
+        return;
+      }
+    }
+
+    // Normal character typing
+    const textNode = document.createTextNode(
+      finalSentences[currentFinalIndex][i++]
+    );
+    typedText.appendChild(textNode);
+
+    // Check if we just typed a period followed by a space (sentence ending)
+    const justTyped = currentText[i - 1];
+    const nextChar = currentText[i];
+
+    if (justTyped === "." && nextChar === " ") {
+      // Add a longer pause for sentence breaks
+      setTimeout(typeFinal, 250);
+    } else {
+      // Normal typing speed
+      setTimeout(typeFinal, 40);
+    }
+  } else {
+    isTyping = false;
+  }
+}
+
+function nextFinalSentence() {
+  if (isTyping) return; // Prevent advancing while typing
+  if (currentFinalIndex < finalSentences.length - 1) {
+    currentFinalIndex++;
+    startFinalTyping();
+    if (debugDropdown) {
+      debugDropdown.value = `final-${currentFinalIndex}`;
+    }
+  }
+  // Could add more logic here for what happens after final sentences
+}
+
+function previousFinalSentence() {
+  if (isTyping) return; // Prevent going back while typing
+  if (currentFinalIndex > 0) {
+    currentFinalIndex--;
+    startFinalTyping();
+    if (debugDropdown) {
+      debugDropdown.value = `final-${currentFinalIndex}`;
+    }
+  } else {
+    // Return to chat mode at the last message
+    finalMode = false;
+    chatMode = true;
+    document.body.classList.add("chat-active");
+
+    if (chatContainer) {
+      chatContainer.classList.add("active");
+    }
+
+    // Restore the chat at the last message
+    currentChatIndex = chatMessages.length - 1;
+    if (debugDropdown) {
+      debugDropdown.value = `chat-${currentChatIndex}`;
+    }
   }
 }
 
