@@ -404,5 +404,232 @@ body {
 }
 
 .profile-item:hover .profile-tooltip {
-  display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* NY Profile Highlighting Styles */
+.profile-item.ny-highlight {
+  position: relative;
+  transform: scale(1.05);
+  transition: all 0.3s ease;
+}
+
+.profile-item.ny-highlight::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700, #ffed4e);
+  background-size: 400% 400%;
+  border-radius: 8px;
+  z-index: -1;
+  animation: golden-glow 2s ease-in-out infinite alternate;
+}
+
+.profile-item.ny-highlight img {
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+}
+
+@keyframes golden-glow {
+  0% {
+    background-position: 0% 50%;
+    opacity: 0.8;
+  }
+  100% {
+    background-position: 100% 50%;
+    opacity: 1;
+  }
+}
+
+/* NY Text Highlighting Styles */
+.chat-text.ny-highlight-text {
+  background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700, #ffed4e);
+  background-size: 400% 400%;
+  color: #333;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  position: relative;
+  animation: golden-text-glow 2s ease-in-out infinite alternate;
+  box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+}
+
+.chat-text.ny-highlight-text::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700, #ffed4e);
+  background-size: 400% 400%;
+  border-radius: 10px;
+  z-index: -1;
+  animation: golden-text-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes golden-text-glow {
+  0% {
+    background-position: 0% 50%;
+    box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+  }
+  100% {
+    background-position: 100% 50%;
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.6);
+  }
+}
+
+/* Skills Profile Highlighting Styles */
+.profile-item.skills-highlight {
+  position: relative;
+  transform: scale(1.05);
+  transition: all 0.3s ease;
+}
+
+.profile-item.skills-highlight::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(45deg, #00d4ff, #0099cc, #00d4ff, #0099cc);
+  background-size: 400% 400%;
+  border-radius: 8px;
+  z-index: -1;
+  animation: cyan-glow 2s ease-in-out infinite alternate;
+}
+
+.profile-item.skills-highlight img {
+  border: 2px solid #00d4ff;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
+}
+
+@keyframes cyan-glow {
+  0% {
+    background-position: 0% 50%;
+    opacity: 0.8;
+  }
+  100% {
+    background-position: 100% 50%;
+    opacity: 1;
+  }
+}
+
+/* Skills Text Highlighting Styles */
+.chat-text.skills-highlight-text {
+  background: linear-gradient(45deg, #00d4ff, #0099cc, #00d4ff, #0099cc);
+  background-size: 400% 400%;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  position: relative;
+  animation: cyan-text-glow 2s ease-in-out infinite alternate;
+  box-shadow: 0 2px 10px rgba(0, 212, 255, 0.3);
+}
+
+.chat-text.skills-highlight-text::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #00d4ff, #0099cc, #00d4ff, #0099cc);
+  background-size: 400% 400%;
+  border-radius: 10px;
+  z-index: -1;
+  animation: cyan-text-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes cyan-text-glow {
+  0% {
+    background-position: 0% 50%;
+    box-shadow: 0 2px 10px rgba(0, 212, 255, 0.3);
+  }
+  100% {
+    background-position: 100% 50%;
+    box-shadow: 0 4px 20px rgba(0, 212, 255, 0.6);
+  }
+}
+
+/* LinkedIn Profile Highlighting Styles */
+.profile-item.linkedin-highlight {
+  position: relative;
+  transform: scale(1.05);
+  transition: all 0.3s ease;
+}
+
+.profile-item.linkedin-highlight::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(45deg, #ff6b9d, #c44569, #ff6b9d, #c44569);
+  background-size: 400% 400%;
+  border-radius: 8px;
+  z-index: -1;
+  animation: magenta-glow 2s ease-in-out infinite alternate;
+}
+
+.profile-item.linkedin-highlight img {
+  border: 2px solid #ff6b9d;
+  box-shadow: 0 0 15px rgba(255, 107, 157, 0.6);
+}
+
+@keyframes magenta-glow {
+  0% {
+    background-position: 0% 50%;
+    opacity: 0.8;
+  }
+  100% {
+    background-position: 100% 50%;
+    opacity: 1;
+  }
+}
+
+/* LinkedIn Text Highlighting Styles */
+.chat-text.linkedin-highlight-text {
+  background: linear-gradient(45deg, #ff6b9d, #c44569, #ff6b9d, #c44569);
+  background-size: 400% 400%;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  position: relative;
+  animation: magenta-text-glow 2s ease-in-out infinite alternate;
+  box-shadow: 0 2px 10px rgba(255, 107, 157, 0.3);
+}
+
+.chat-text.linkedin-highlight-text::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #ff6b9d, #c44569, #ff6b9d, #c44569);
+  background-size: 400% 400%;
+  border-radius: 10px;
+  z-index: -1;
+  animation: magenta-text-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes magenta-text-glow {
+  0% {
+    background-position: 0% 50%;
+    box-shadow: 0 2px 10px rgba(255, 107, 157, 0.3);
+  }
+  100% {
+    background-position: 100% 50%;
+    box-shadow: 0 4px 20px rgba(255, 107, 157, 0.6);
+  }
 }

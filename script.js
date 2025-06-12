@@ -13,6 +13,31 @@ const sentences = [
   "Cuz if you got to know me, I think there's a 2-10% chance you'd hire me.",
 ];
 
+// ! Names to highlight (New York residents)
+const nyNames = [
+  "Lukas Bentel",
+  "Kevin Wiesner",
+  "Alexander An",
+  "Jaymart Yabo",
+  "Ed L",
+  "Andrew Deitchman",
+  "Craig von Wiederhold",
+  "Piers Helmore",
+  "Julia Hayes",
+  "Karen Wong",
+  "James Kernan",
+  "Arya Tabatabai",
+  "Emma Howard",
+  "Jake Krowicki",
+  "JC Li",
+  "Robert Stinchcomb",
+  "jesse lane",
+  "Hope Harrison",
+  "Josh Rollin",
+  "Stephen T.",
+  "John Belcaster",
+];
+
 // ! Chat Messages
 const chatMessages = [
   {
@@ -56,24 +81,150 @@ const chatMessages = [
 // Second chat messages (placeholder for now)
 const secondChatMessages = [
   {
+    sender: "mschf",
+    text: "*checks watch, visibly unsettled*",
+    side: "left",
+  },
+  {
     sender: "js",
-    text: "placeholder text",
+    text: "Many of us share a fondness for overpriced coffee and underresourced trash departments.",
+    side: "right",
+  },
+  {
+    sender: "js",
+    text: "Some of us share the same skills and experience. And, in the case of Johnny Thaw, the same Pornhub handle.",
+    side: "right",
+  },
+  {
+    sender: "js",
+    text: "And some of us, for worse or for worse, are LinkedIn power users. If you have more than 1,000 connections, you're never alone.",
     side: "right",
   },
 ];
 
 // Merge the two chat sets into a single ordered feed and set up grid trigger helpers
 chatMessages.push(...secondChatMessages);
-const PLACEHOLDER_TRIGGER_TEXT = "placeholder text";
+const PLACEHOLDER_TRIGGER_TEXT =
+  "I wrote a script to scrape LinkedIn. It retrieved ~80 MSCHF employees and their information.";
+const HIGHLIGHT_TRIGGER_TEXT =
+  "Many of us share a fondness for overpriced coffee and underresourced trash departments.";
+const SKILLS_TRIGGER_TEXT =
+  "Some of us share the same skills and experience. And, in the case of Johnny Thaw, the same Pornhub handle.";
+const LINKEDIN_TRIGGER_TEXT =
+  "And some of us, for worse or for worse, are LinkedIn power users. If you have more than 1,000 connections, you're never alone.";
 const placeholderIndex = chatMessages.findIndex(
   (msg) => msg.text === PLACEHOLDER_TRIGGER_TEXT
 );
+const highlightIndex = chatMessages.findIndex(
+  (msg) => msg.text === HIGHLIGHT_TRIGGER_TEXT
+);
+const skillsIndex = chatMessages.findIndex(
+  (msg) => msg.text === SKILLS_TRIGGER_TEXT
+);
+const linkedinIndex = chatMessages.findIndex(
+  (msg) => msg.text === LINKEDIN_TRIGGER_TEXT
+);
 let gridShown = false;
+let highlightShown = false;
+let skillsHighlightShown = false;
+let linkedinHighlightShown = false;
+let profileElements = []; // Store profile elements for highlighting
+
 function hideProfileGrid() {
   const grid = document.getElementById("profile-grid");
   if (grid) {
     grid.style.display = "none";
   }
+  // Reset highlighting when grid is hidden
+  highlightShown = false;
+  skillsHighlightShown = false;
+  linkedinHighlightShown = false;
+  unhighlightNYProfiles();
+  unhighlightSkills();
+  unhighlightLinkedInProfiles();
+}
+
+// Function to highlight NY profiles
+function highlightNYProfiles() {
+  if (highlightShown) return;
+
+  profileElements.forEach((profileData) => {
+    const { element, name } = profileData;
+    // Check if this profile's name matches any NY name (case-insensitive)
+    const isNYResident = nyNames.some(
+      (nyName) => name && name.toLowerCase().includes(nyName.toLowerCase())
+    );
+
+    if (isNYResident) {
+      element.classList.add("ny-highlight");
+    }
+  });
+
+  highlightShown = true;
+}
+
+// Function to remove highlighting
+function unhighlightNYProfiles() {
+  profileElements.forEach((profileData) => {
+    profileData.element.classList.remove("ny-highlight");
+  });
+  highlightShown = false;
+}
+
+// Function to highlight skills profiles
+function highlightSkills() {
+  if (skillsHighlightShown) return;
+
+  profileElements.forEach((profileData) => {
+    const { element, name } = profileData;
+    // Check if this profile's name matches any skills name (case-insensitive)
+    const isSkillsMatch = skillsNames.some(
+      (skillsName) =>
+        name && name.toLowerCase().includes(skillsName.toLowerCase())
+    );
+
+    if (isSkillsMatch) {
+      element.classList.add("skills-highlight");
+    }
+  });
+
+  skillsHighlightShown = true;
+}
+
+// Function to remove skills highlighting
+function unhighlightSkills() {
+  profileElements.forEach((profileData) => {
+    profileData.element.classList.remove("skills-highlight");
+  });
+  skillsHighlightShown = false;
+}
+
+// Function to highlight LinkedIn power user profiles
+function highlightLinkedInProfiles() {
+  if (linkedinHighlightShown) return;
+
+  profileElements.forEach((profileData) => {
+    const { element, name } = profileData;
+    // Check if this profile's name matches any LinkedIn power user name (case-insensitive)
+    const isLinkedInPowerUser = linkedinNames.some(
+      (linkedinName) =>
+        name && name.toLowerCase().includes(linkedinName.toLowerCase())
+    );
+
+    if (isLinkedInPowerUser) {
+      element.classList.add("linkedin-highlight");
+    }
+  });
+
+  linkedinHighlightShown = true;
+}
+
+// Function to remove LinkedIn highlighting
+function unhighlightLinkedInProfiles() {
+  profileElements.forEach((profileData) => {
+    profileData.element.classList.remove("linkedin-highlight");
+  });
+  linkedinHighlightShown = false;
 }
 
 // Helper to always keep the latest chat content in view
@@ -578,6 +729,24 @@ function startChatMessage() {
     gridShown = true;
   }
 
+  // Trigger NY highlighting when the highlight message is reached
+  if (!highlightShown && message.text === HIGHLIGHT_TRIGGER_TEXT) {
+    console.log("Triggering NY profile highlighting");
+    highlightNYProfiles();
+  }
+
+  // Trigger skills highlighting when the skills message is reached
+  if (!skillsHighlightShown && message.text === SKILLS_TRIGGER_TEXT) {
+    console.log("Triggering skills highlighting");
+    highlightSkills();
+  }
+
+  // Trigger LinkedIn highlighting when the LinkedIn message is reached
+  if (!linkedinHighlightShown && message.text === LINKEDIN_TRIGGER_TEXT) {
+    console.log("Triggering LinkedIn profile highlighting");
+    highlightLinkedInProfiles();
+  }
+
   // Start typing the message or show video
   if (message.type === "video") {
     console.log("Showing video for message index:", currentChatIndex);
@@ -597,6 +766,21 @@ function typeChatMessage(text, messageIndex) {
       messageIndex
     );
     return;
+  }
+
+  // Apply NY highlighting class if this is the highlight trigger text
+  if (text === HIGHLIGHT_TRIGGER_TEXT) {
+    textElement.classList.add("ny-highlight-text");
+  }
+
+  // Apply skills highlighting class if this is the skills trigger text
+  if (text === SKILLS_TRIGGER_TEXT) {
+    textElement.classList.add("skills-highlight-text");
+  }
+
+  // Apply LinkedIn highlighting class if this is the LinkedIn trigger text
+  if (text === LINKEDIN_TRIGGER_TEXT) {
+    textElement.classList.add("linkedin-highlight-text");
   }
 
   let charIndex = 0;
@@ -663,6 +847,9 @@ function loadProfileGrid() {
     return;
   }
 
+  // Reset profile elements array
+  profileElements = [];
+
   fetch("mschf_profiles_detailed_full-wjosh.csv")
     .then((response) => response.text())
     .then((csvText) => {
@@ -694,6 +881,9 @@ function loadProfileGrid() {
               item.appendChild(img);
               item.appendChild(tooltip);
               grid.appendChild(item);
+
+              // Store profile data for highlighting
+              profileElements.push({ element: item, name: row.name });
             }
           });
           grid.dataset.loaded = "true";
@@ -718,6 +908,21 @@ function previousChatMessage() {
     if (gridShown && currentChatIndex < placeholderIndex) {
       hideProfileGrid();
       gridShown = false;
+    }
+
+    // Hide highlighting if we've moved before its trigger message
+    if (highlightShown && currentChatIndex < highlightIndex) {
+      unhighlightNYProfiles();
+    }
+
+    // Hide skills highlighting if we've moved before its trigger message
+    if (skillsHighlightShown && currentChatIndex < skillsIndex) {
+      unhighlightSkills();
+    }
+
+    // Hide LinkedIn highlighting if we've moved before its trigger message
+    if (linkedinHighlightShown && currentChatIndex < linkedinIndex) {
+      unhighlightLinkedInProfiles();
     }
 
     // Update debug dropdown selection if present
@@ -754,3 +959,26 @@ function previousChatMessage() {
 
 // ! Start the Animation
 startTyping();
+
+// ! Names to highlight (skills and experience matches)
+const skillsNames = [
+  "Nathan Trumbull",
+  "Yianni Sines",
+  "Tyler Wibert",
+  "Sandro Espinosa Galindo",
+  "Jonny Thaw",
+  "Jenny Benevento",
+];
+
+// ! Names to highlight (LinkedIn power users)
+const linkedinNames = [
+  "Mark Bietz",
+  "Jesper Larsson",
+  "Dwight Zähringer",
+  "Christina Bull",
+  "Daniel High",
+  "Jonathan Farrugia",
+  "Olzhas Yergaliyev",
+  "jesse lane",
+  "Niek Dekker r",
+];
