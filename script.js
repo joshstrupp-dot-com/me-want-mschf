@@ -100,6 +100,16 @@ const secondChatMessages = [
     text: "And some of us, for worse or for worse, are LinkedIn power users. If you have more than 1,000 connections, you're never alone.",
     side: "right",
   },
+  {
+    sender: "mschf",
+    text: "Uhhh... k. Let's talk about your work. Got any projects we might find interesting?",
+    side: "left",
+  },
+  {
+    sender: "js",
+    text: "A handful",
+    side: "right",
+  },
 ];
 
 // Merge the two chat sets into a single ordered feed and set up grid trigger helpers
@@ -112,6 +122,7 @@ const SKILLS_TRIGGER_TEXT =
   "Some of us share the same skills and experience. And, in the case of Johnny Thaw, the same Pornhub handle.";
 const LINKEDIN_TRIGGER_TEXT =
   "And some of us, for worse or for worse, are LinkedIn power users. If you have more than 1,000 connections, you're never alone.";
+const VIDEO_TRIGGER_TEXT = "A handful";
 const placeholderIndex = chatMessages.findIndex(
   (msg) => msg.text === PLACEHOLDER_TRIGGER_TEXT
 );
@@ -124,10 +135,14 @@ const skillsIndex = chatMessages.findIndex(
 const linkedinIndex = chatMessages.findIndex(
   (msg) => msg.text === LINKEDIN_TRIGGER_TEXT
 );
+const videoIndex = chatMessages.findIndex(
+  (msg) => msg.text === VIDEO_TRIGGER_TEXT
+);
 let gridShown = false;
 let highlightShown = false;
 let skillsHighlightShown = false;
 let linkedinHighlightShown = false;
+let videoShown = false;
 let profileElements = []; // Store profile elements for highlighting
 
 function hideProfileGrid() {
@@ -139,9 +154,11 @@ function hideProfileGrid() {
   highlightShown = false;
   skillsHighlightShown = false;
   linkedinHighlightShown = false;
+  videoShown = false;
   unhighlightNYProfiles();
   unhighlightSkills();
   unhighlightLinkedInProfiles();
+  hideVideoContainer();
 }
 
 // Function to highlight NY profiles
@@ -225,6 +242,65 @@ function unhighlightLinkedInProfiles() {
     profileData.element.classList.remove("linkedin-highlight");
   });
   linkedinHighlightShown = false;
+}
+
+// Function to show video container and hide profile grid
+function showVideoContainer() {
+  if (videoShown) return;
+
+  // Hide the profile grid
+  const grid = document.getElementById("profile-grid");
+  if (grid) {
+    grid.style.display = "none";
+  }
+
+  // Show the video container
+  let videoContainer = document.getElementById("headlines-video-container");
+  if (!videoContainer) {
+    // Create the video container if it doesn't exist
+    videoContainer = document.createElement("div");
+    videoContainer.id = "headlines-video-container";
+    videoContainer.style.cssText = `
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 50vw;
+      height: 100vh;
+      z-index: 1000;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `;
+
+    const video = document.createElement("video");
+    video.src = "assets/headlines-grab.mp4";
+    video.controls = true;
+    video.autoplay = true;
+    video.muted = true;
+    video.loop = true;
+    video.style.cssText = `
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    `;
+
+    videoContainer.appendChild(video);
+    document.body.appendChild(videoContainer);
+  } else {
+    videoContainer.style.display = "flex";
+  }
+
+  videoShown = true;
+}
+
+// Function to hide video container
+function hideVideoContainer() {
+  const videoContainer = document.getElementById("headlines-video-container");
+  if (videoContainer) {
+    videoContainer.style.display = "none";
+  }
+  videoShown = false;
 }
 
 // Helper to always keep the latest chat content in view
@@ -461,16 +537,29 @@ function createDebugDropdown() {
   chatOption.textContent = "CHAT: Jump to chat section";
   dropdown.appendChild(chatOption);
 
+  // Add options for each chat message so we can jump directly to them
+  chatMessages.forEach((message, index) => {
+    const option = document.createElement("option");
+    option.value = `chat-${index}`;
+    const preview = message.text ? message.text.substring(0, 30) : "[video]";
+    option.textContent = `CHAT ${index}: ${preview}...`;
+    dropdown.appendChild(option);
+  });
+
   // Set initial value
-  dropdown.value = chatMode ? "chat" : currentSentenceIndex;
+  dropdown.value = chatMode ? `chat-${currentChatIndex}` : currentSentenceIndex;
 
   // Add event listener
   dropdown.addEventListener("change", function (event) {
     const selectedValue = event.target.value;
 
     if (selectedValue === "chat") {
-      // Jump to chat section
+      // Jump to beginning of chat
       transitionToChat();
+    } else if (selectedValue.startsWith("chat-")) {
+      // Jump to specific chat message
+      const chatIdx = parseInt(selectedValue.split("-")[1]);
+      jumpToChatIndex(chatIdx);
     } else {
       const newIndex = parseInt(selectedValue);
       if (newIndex >= 0 && newIndex < sentences.length) {
@@ -509,14 +598,18 @@ const originalPreviousSentence = previousSentence;
 nextSentence = function () {
   originalNextSentence();
   if (debugDropdown) {
-    debugDropdown.value = chatMode ? "chat" : currentSentenceIndex;
+    debugDropdown.value = chatMode
+      ? `chat-${currentChatIndex}`
+      : currentSentenceIndex;
   }
 };
 
 previousSentence = function () {
   originalPreviousSentence();
   if (debugDropdown) {
-    debugDropdown.value = chatMode ? "chat" : currentSentenceIndex;
+    debugDropdown.value = chatMode
+      ? `chat-${currentChatIndex}`
+      : currentSentenceIndex;
   }
 };
 
@@ -652,7 +745,7 @@ function transitionToChat() {
 
   // Update debug dropdown
   if (debugDropdown) {
-    debugDropdown.value = "chat";
+    debugDropdown.value = `chat-${currentChatIndex}`;
   }
 
   // Start first chat message
@@ -747,6 +840,12 @@ function startChatMessage() {
     highlightLinkedInProfiles();
   }
 
+  // Trigger video container when the video message is reached
+  if (!videoShown && message.text === VIDEO_TRIGGER_TEXT) {
+    console.log("Triggering video container");
+    showVideoContainer();
+  }
+
   // Start typing the message or show video
   if (message.type === "video") {
     console.log("Showing video for message index:", currentChatIndex);
@@ -831,6 +930,9 @@ function nextChatMessage() {
     currentChatIndex++;
     console.log("Advancing to message index:", currentChatIndex);
     startChatMessage();
+    if (debugDropdown) {
+      debugDropdown.value = `chat-${currentChatIndex}`;
+    }
   } else {
     console.log("Already at last message");
   }
@@ -925,9 +1027,21 @@ function previousChatMessage() {
       unhighlightLinkedInProfiles();
     }
 
+    // Hide video container if we've moved before its trigger message
+    if (videoShown && currentChatIndex < videoIndex) {
+      hideVideoContainer();
+      // Show profile grid again if we're still after its trigger message
+      if (currentChatIndex >= placeholderIndex) {
+        const grid = document.getElementById("profile-grid");
+        if (grid && grid.dataset.loaded === "true") {
+          grid.style.display = "grid";
+        }
+      }
+    }
+
     // Update debug dropdown selection if present
     if (debugDropdown) {
-      debugDropdown.value = "chat";
+      debugDropdown.value = `chat-${currentChatIndex}`;
     }
   } else {
     // We are on the very first message – exit chat mode back to the last sentence.
@@ -954,6 +1068,92 @@ function previousChatMessage() {
     if (debugDropdown) {
       debugDropdown.value = currentSentenceIndex;
     }
+  }
+}
+
+// Utility to instantly render the chat up to a given index and jump there
+function jumpToChatIndex(targetIndex) {
+  if (
+    typeof targetIndex !== "number" ||
+    targetIndex < 0 ||
+    targetIndex >= chatMessages.length
+  ) {
+    return;
+  }
+
+  // Enter chat mode and reset state
+  document.body.classList.add("chat-active");
+  hideScreensaver();
+  hidePassbyScreensaver();
+  hideProfileGrid();
+
+  gridShown = false;
+  highlightShown = false;
+  skillsHighlightShown = false;
+  linkedinHighlightShown = false;
+  videoShown = false;
+  unhighlightNYProfiles();
+  unhighlightSkills();
+  unhighlightLinkedInProfiles();
+  hideVideoContainer();
+
+  // Show chat container
+  if (chatContainer) {
+    chatContainer.classList.add("active");
+  }
+
+  chatMode = true;
+  isTyping = false;
+
+  // Clear existing messages
+  if (chatMessagesContainer) {
+    chatMessagesContainer.innerHTML = "";
+  }
+
+  // Render messages up to the requested index
+  for (let idx = 0; idx <= targetIndex; idx++) {
+    currentChatIndex = idx;
+    const message = chatMessages[idx];
+    const msgEl = createChatMessage(message);
+    if (chatMessagesContainer) {
+      chatMessagesContainer.appendChild(msgEl);
+    }
+
+    // Trigger grid/highlight side-effects just like progressive playback
+    if (!gridShown && message.text === PLACEHOLDER_TRIGGER_TEXT) {
+      loadProfileGrid();
+      gridShown = true;
+    }
+    if (!highlightShown && message.text === HIGHLIGHT_TRIGGER_TEXT) {
+      highlightNYProfiles();
+    }
+    if (!skillsHighlightShown && message.text === SKILLS_TRIGGER_TEXT) {
+      highlightSkills();
+    }
+    if (!linkedinHighlightShown && message.text === LINKEDIN_TRIGGER_TEXT) {
+      highlightLinkedInProfiles();
+    }
+    if (!videoShown && message.text === VIDEO_TRIGGER_TEXT) {
+      showVideoContainer();
+    }
+
+    // Populate content instantly (skip typing)
+    if (message.type === "video") {
+      showChatVideo(idx);
+    } else {
+      const textEl = document.getElementById(`chat-text-${idx}`);
+      if (textEl) textEl.textContent = message.text;
+    }
+  }
+
+  // Ensure the latest message is visible
+  ensureChatInView();
+
+  // Finalise state
+  currentChatIndex = targetIndex;
+
+  if (debugDropdown) {
+    debugDropdown.value = `chat-${currentChatIndex}`;
   }
 }
 
