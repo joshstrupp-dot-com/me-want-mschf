@@ -1265,6 +1265,20 @@ function loadProfileGrid() {
               tooltip.className = "profile-tooltip";
               tooltip.innerText = tooltipParts.join("\n");
 
+              // Add hover event listeners to position tooltip dynamically
+              item.addEventListener("mouseenter", function () {
+                const rect = item.getBoundingClientRect();
+                const tooltipHeight = 80; // Approximate tooltip height
+                const topSpace = rect.top;
+
+                // If there's not enough space above (less than tooltip height + buffer)
+                if (topSpace < tooltipHeight + 20) {
+                  tooltip.classList.remove("tooltip-above");
+                } else {
+                  tooltip.classList.add("tooltip-above");
+                }
+              });
+
               item.appendChild(img);
               item.appendChild(tooltip);
               grid.appendChild(item);
