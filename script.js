@@ -65,7 +65,7 @@ const chatMessages = [
   },
   {
     sender: "js",
-    text: "But I found something out — I have a lot in common with y'all.",
+    text: "But I did my research — we have a lot in common!",
     side: "right",
   },
   {
@@ -85,7 +85,7 @@ const chatMessages = [
 const secondChatMessages = [
   {
     sender: "mschf",
-    text: "*visibly unsettled*",
+    text: "uhhhhhhhhhhhhhhhhhhhhhhh wut",
     side: "left",
   },
   {
@@ -105,7 +105,7 @@ const secondChatMessages = [
   },
   {
     sender: "mschf",
-    text: "Uhhh... k. Let's talk about your work. Got any projects we might find interesting?",
+    text: "Right. Okay. Moving on. Let's talk about your work. Got any projects we might find interesting?",
     side: "left",
   },
   {
@@ -115,7 +115,7 @@ const secondChatMessages = [
   },
   {
     sender: "js",
-    text: "Or this open source CAPTCHA that reminds everyone to keep your hands off our collective pussies.",
+    text: "Or this CAPTCHA-style reminder that Ted Cruz should stay the f*** away from our uteri.",
     side: "right",
   },
   {
@@ -142,7 +142,7 @@ const LINKEDIN_TRIGGER_TEXT =
   "And some of us, for worse or for worse, are LinkedIn power users. If you have more than 1,000 connections, you're never alone.";
 const VIDEO_TRIGGER_TEXT = "A handful — like this bootleg New York Times game";
 const SECOND_VIDEO_TRIGGER_TEXT =
-  "Or this open source CAPTCHA that reminds everyone to keep your hands off our collective pussies.";
+  "Or this CAPTCHA-style reminder that Ted Cruz should stay the f*** away from our uteri.";
 const THIRD_VIDEO_TRIGGER_TEXT =
   "And this Tinder-style game to identify fake news. I'm sorry to say, it won't help you hook up in airplane bathrooms...";
 const placeholderIndex = chatMessages.findIndex(

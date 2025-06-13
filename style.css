@@ -164,67 +164,6 @@ body {
   right: 2px;
 }
 
-/* Skateboard Animation */
-@keyframes skateboard-ride {
-  0% {
-    transform: translateX(0) rotate(0deg);
-  }
-  70% {
-    transform: translateX(calc(100vw - 150px)) rotate(0deg);
-  }
-  85% {
-    transform: translateX(calc(100vw - 100px)) rotate(360deg) scale(1.2);
-  }
-  100% {
-    transform: translateX(calc(100vw + 50px)) rotate(360deg) scale(1);
-  }
-}
-
-@keyframes character-trick {
-  0%,
-  70% {
-    transform: rotate(0deg);
-  }
-  75% {
-    transform: rotate(-15deg);
-  }
-  80% {
-    transform: rotate(15deg);
-  }
-  85% {
-    transform: rotate(-10deg);
-  }
-  90% {
-    transform: rotate(5deg);
-  }
-  100% {
-    transform: rotate(0deg);
-  }
-}
-
-@keyframes wheel-spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(1080deg);
-  }
-}
-
-/* Animation states */
-.skateboard-animate {
-  animation: skateboard-ride 4s ease-in-out forwards;
-}
-
-.skateboard-animate #skateboard-character {
-  animation: character-trick 4s ease-in-out forwards;
-}
-
-.skateboard-animate .skateboard-wheel-left,
-.skateboard-animate .skateboard-wheel-right {
-  animation: wheel-spin 4s linear forwards;
-}
-
 /* Chat Interface Styles */
 .chat-container {
   display: none;
