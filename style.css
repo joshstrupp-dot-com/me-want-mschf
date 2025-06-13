@@ -164,67 +164,6 @@ body {
   right: 2px;
 }
 
-/* Skateboard Animation */
-@keyframes skateboard-ride {
-  0% {
-    transform: translateX(0) rotate(0deg);
-  }
-  70% {
-    transform: translateX(calc(100vw - 150px)) rotate(0deg);
-  }
-  85% {
-    transform: translateX(calc(100vw - 100px)) rotate(360deg) scale(1.2);
-  }
-  100% {
-    transform: translateX(calc(100vw + 50px)) rotate(360deg) scale(1);
-  }
-}
-
-@keyframes character-trick {
-  0%,
-  70% {
-    transform: rotate(0deg);
-  }
-  75% {
-    transform: rotate(-15deg);
-  }
-  80% {
-    transform: rotate(15deg);
-  }
-  85% {
-    transform: rotate(-10deg);
-  }
-  90% {
-    transform: rotate(5deg);
-  }
-  100% {
-    transform: rotate(0deg);
-  }
-}
-
-@keyframes wheel-spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(1080deg);
-  }
-}
-
-/* Animation states */
-.skateboard-animate {
-  animation: skateboard-ride 4s ease-in-out forwards;
-}
-
-.skateboard-animate #skateboard-character {
-  animation: character-trick 4s ease-in-out forwards;
-}
-
-.skateboard-animate .skateboard-wheel-left,
-.skateboard-animate .skateboard-wheel-right {
-  animation: wheel-spin 4s linear forwards;
-}
-
 /* Chat Interface Styles */
 .chat-container {
   display: none;
@@ -387,9 +326,6 @@ body {
 .profile-tooltip {
   display: none;
   position: absolute;
-  bottom: 110%;
-  left: 50%;
-  transform: translateX(-50%);
   background: #ffffff;
   color: #000000;
   font-family: "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New",
@@ -402,8 +338,237 @@ body {
   text-align: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   z-index: 5;
+  min-width: 100px;
+  max-width: 200px;
 }
 
 .profile-item:hover .profile-tooltip {
-  display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* NY Profile Highlighting Styles */
+.profile-item.ny-highlight {
+  position: relative;
+  transform: scale(1.05);
+  transition: all 0.3s ease;
+}
+
+.profile-item.ny-highlight::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700, #ffed4e);
+  background-size: 400% 400%;
+  border-radius: 8px;
+  z-index: -1;
+  animation: golden-glow 2s ease-in-out infinite alternate;
+}
+
+.profile-item.ny-highlight img {
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+}
+
+@keyframes golden-glow {
+  0% {
+    background-position: 0% 50%;
+    opacity: 0.8;
+  }
+  100% {
+    background-position: 100% 50%;
+    opacity: 1;
+  }
+}
+
+/* NY Text Highlighting Styles */
+.chat-text.ny-highlight-text {
+  background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700, #ffed4e);
+  background-size: 400% 400%;
+  color: #333;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  position: relative;
+  animation: golden-text-glow 2s ease-in-out infinite alternate;
+  box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+}
+
+.chat-text.ny-highlight-text::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700, #ffed4e);
+  background-size: 400% 400%;
+  border-radius: 10px;
+  z-index: -1;
+  animation: golden-text-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes golden-text-glow {
+  0% {
+    background-position: 0% 50%;
+    box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+  }
+  100% {
+    background-position: 100% 50%;
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.6);
+  }
+}
+
+/* Skills Profile Highlighting Styles */
+.profile-item.skills-highlight {
+  position: relative;
+  transform: scale(1.05);
+  transition: all 0.3s ease;
+}
+
+.profile-item.skills-highlight::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(45deg, #00d4ff, #0099cc, #00d4ff, #0099cc);
+  background-size: 400% 400%;
+  border-radius: 8px;
+  z-index: -1;
+  animation: cyan-glow 2s ease-in-out infinite alternate;
+}
+
+.profile-item.skills-highlight img {
+  border: 2px solid #00d4ff;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
+}
+
+@keyframes cyan-glow {
+  0% {
+    background-position: 0% 50%;
+    opacity: 0.8;
+  }
+  100% {
+    background-position: 100% 50%;
+    opacity: 1;
+  }
+}
+
+/* Skills Text Highlighting Styles */
+.chat-text.skills-highlight-text {
+  background: linear-gradient(45deg, #00d4ff, #0099cc, #00d4ff, #0099cc);
+  background-size: 400% 400%;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  position: relative;
+  animation: cyan-text-glow 2s ease-in-out infinite alternate;
+  box-shadow: 0 2px 10px rgba(0, 212, 255, 0.3);
+}
+
+.chat-text.skills-highlight-text::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #00d4ff, #0099cc, #00d4ff, #0099cc);
+  background-size: 400% 400%;
+  border-radius: 10px;
+  z-index: -1;
+  animation: cyan-text-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes cyan-text-glow {
+  0% {
+    background-position: 0% 50%;
+    box-shadow: 0 2px 10px rgba(0, 212, 255, 0.3);
+  }
+  100% {
+    background-position: 100% 50%;
+    box-shadow: 0 4px 20px rgba(0, 212, 255, 0.6);
+  }
+}
+
+/* LinkedIn Profile Highlighting Styles */
+.profile-item.linkedin-highlight {
+  position: relative;
+  transform: scale(1.05);
+  transition: all 0.3s ease;
+}
+
+.profile-item.linkedin-highlight::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(45deg, #ff6b9d, #c44569, #ff6b9d, #c44569);
+  background-size: 400% 400%;
+  border-radius: 8px;
+  z-index: -1;
+  animation: magenta-glow 2s ease-in-out infinite alternate;
+}
+
+.profile-item.linkedin-highlight img {
+  border: 2px solid #ff6b9d;
+  box-shadow: 0 0 15px rgba(255, 107, 157, 0.6);
+}
+
+@keyframes magenta-glow {
+  0% {
+    background-position: 0% 50%;
+    opacity: 0.8;
+  }
+  100% {
+    background-position: 100% 50%;
+    opacity: 1;
+  }
+}
+
+/* LinkedIn Text Highlighting Styles */
+.chat-text.linkedin-highlight-text {
+  background: linear-gradient(45deg, #ff6b9d, #c44569, #ff6b9d, #c44569);
+  background-size: 400% 400%;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  position: relative;
+  animation: magenta-text-glow 2s ease-in-out infinite alternate;
+  box-shadow: 0 2px 10px rgba(255, 107, 157, 0.3);
+}
+
+.chat-text.linkedin-highlight-text::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #ff6b9d, #c44569, #ff6b9d, #c44569);
+  background-size: 400% 400%;
+  border-radius: 10px;
+  z-index: -1;
+  animation: magenta-text-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes magenta-text-glow {
+  0% {
+    background-position: 0% 50%;
+    box-shadow: 0 2px 10px rgba(255, 107, 157, 0.3);
+  }
+  100% {
+    background-position: 100% 50%;
+    box-shadow: 0 4px 20px rgba(255, 107, 157, 0.6);
+  }
 }
