@@ -226,13 +226,13 @@ body {
 }
 
 .chat-icon.js {
-  background: #f00007;
+  background: #000000;
   color: #ffc700;
 }
 
 .chat-icon img {
-  width: 24px;
-  height: 24px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
 }
 

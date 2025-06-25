@@ -26,7 +26,9 @@ const finalSentences = [
   "If it gets me an interview, I can claim it works —",
   "then release the template for anyone to use.",
   "1:1 instead of 1:3,841.",
-  "Regardless, I'd love to be in touch. Thank you for the simulated opportunity!",
+  "Regardless, I'd love to be in touch—",
+  "—for freelance/contract CD, copy, data, or ux design/dev roles.",
+  "Thank you for the simulated opportunity!",
   "Check out the ole portfolio, or reach out any time.",
 ];
 
@@ -109,7 +111,7 @@ const secondChatMessages = [
   },
   {
     sender: "js",
-    text: "I share listed skills and experience with some. And, in the case of Johnny Thaw, the same Pornhub handle.",
+    text: "We share skills, experience and — in the case of Johnny Thaw — a pornhub handle.",
     side: "right",
   },
   {
@@ -150,7 +152,7 @@ const PLACEHOLDER_TRIGGER_TEXT =
   "I wrote a script to scrape LinkedIn. It retrieved ~80 MSCHF employees and their information.";
 const HIGHLIGHT_TRIGGER_TEXT = "I live in NYC. Many of you live in NYC.";
 const SKILLS_TRIGGER_TEXT =
-  "I share listed skills and experience with some. And, in the case of Johnny Thaw, the same Pornhub handle.";
+  "We share skills, experience and — in the case of Johnny Thaw — a pornhub handle.";
 const LINKEDIN_TRIGGER_TEXT =
   "And some of us, for worse or for worse, are LinkedIn power users. If you have more than 1,000 connections, you're never alone.";
 const VIDEO_TRIGGER_TEXT = "A handful — like this bootleg New York Times game.";
@@ -1225,7 +1227,10 @@ function createChatMessage(message) {
     img.alt = "MSCHF";
     iconDiv.appendChild(img);
   } else if (message.sender === "js") {
-    iconDiv.textContent = "JS";
+    const img = document.createElement("img");
+    img.src = "assets/js-icon-2.png";
+    img.alt = "JS";
+    iconDiv.appendChild(img);
   }
 
   const bubbleDiv = document.createElement("div");
@@ -1451,6 +1456,20 @@ function loadProfileGrid() {
   // Reset profile elements array
   profileElements = [];
 
+  // Array of filler images to use when profile images are missing
+  const fillerImages = [
+    "assets/prof-pic-fillers/1.png",
+    "assets/prof-pic-fillers/2.png",
+    "assets/prof-pic-fillers/3.png",
+    "assets/prof-pic-fillers/4.png",
+    "assets/prof-pic-fillers/5.png",
+  ];
+
+  // Function to get a random filler image
+  function getRandomFillerImage() {
+    return fillerImages[Math.floor(Math.random() * fillerImages.length)];
+  }
+
   fetch("mschf_profiles_detailed_full-wjosh.csv")
     .then((response) => response.text())
     .then((csvText) => {
@@ -1460,46 +1479,57 @@ function loadProfileGrid() {
         complete: function (results) {
           results.data.forEach((row) => {
             const url = row.image_url && row.image_url.trim();
+
+            // Always create a profile item, even if image_url is missing
+            const item = document.createElement("div");
+            item.className = "profile-item";
+
+            const img = document.createElement("img");
+            img.loading = "lazy";
+
+            // Use original image if available, otherwise use a random filler
             if (url) {
-              const item = document.createElement("div");
-              item.className = "profile-item";
-
-              const img = document.createElement("img");
               img.src = url;
-              img.loading = "lazy";
-
-              // Build tooltip content with required fields
-              const tooltipParts = [];
-              if (row.name) tooltipParts.push(row.name);
-              if (row.title) tooltipParts.push(row.title);
-              if (row.location) tooltipParts.push(row.location);
-              if (row.followers) tooltipParts.push(row.followers);
-
-              const tooltip = document.createElement("div");
-              tooltip.className = "profile-tooltip";
-              tooltip.innerText = tooltipParts.join("\n");
-
-              // Add hover event listeners to position tooltip dynamically
-              item.addEventListener("mouseenter", function () {
-                const rect = item.getBoundingClientRect();
-                const tooltipHeight = 80; // Approximate tooltip height
-                const topSpace = rect.top;
-
-                // If there's not enough space above (less than tooltip height + buffer)
-                if (topSpace < tooltipHeight + 20) {
-                  tooltip.classList.remove("tooltip-above");
-                } else {
-                  tooltip.classList.add("tooltip-above");
-                }
-              });
-
-              item.appendChild(img);
-              item.appendChild(tooltip);
-              grid.appendChild(item);
-
-              // Store profile data for highlighting
-              profileElements.push({ element: item, name: row.name });
+              // Add error handler to fall back to filler image if original fails to load
+              img.onerror = function () {
+                this.src = getRandomFillerImage();
+                this.onerror = null; // Prevent infinite loop if filler also fails
+              };
+            } else {
+              img.src = getRandomFillerImage();
             }
+
+            // Build tooltip content with required fields
+            const tooltipParts = [];
+            if (row.name) tooltipParts.push(row.name);
+            if (row.title) tooltipParts.push(row.title);
+            if (row.location) tooltipParts.push(row.location);
+            if (row.followers) tooltipParts.push(row.followers);
+
+            const tooltip = document.createElement("div");
+            tooltip.className = "profile-tooltip";
+            tooltip.innerText = tooltipParts.join("\n");
+
+            // Add hover event listeners to position tooltip dynamically
+            item.addEventListener("mouseenter", function () {
+              const rect = item.getBoundingClientRect();
+              const tooltipHeight = 80; // Approximate tooltip height
+              const topSpace = rect.top;
+
+              // If there's not enough space above (less than tooltip height + buffer)
+              if (topSpace < tooltipHeight + 20) {
+                tooltip.classList.remove("tooltip-above");
+              } else {
+                tooltip.classList.add("tooltip-above");
+              }
+            });
+
+            item.appendChild(img);
+            item.appendChild(tooltip);
+            grid.appendChild(item);
+
+            // Store profile data for highlighting
+            profileElements.push({ element: item, name: row.name });
           });
           grid.dataset.loaded = "true";
           grid.style.display = "grid";
