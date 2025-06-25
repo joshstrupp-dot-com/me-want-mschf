@@ -324,7 +324,6 @@ body {
 }
 
 .profile-tooltip {
-  display: none;
   position: absolute;
   background: #ffffff;
   color: #000000;
@@ -340,12 +339,31 @@ body {
   z-index: 5;
   min-width: 100px;
   max-width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+  left: 50%;
+  pointer-events: none;
+  /* Default position below */
+  top: 100%;
+  transform: translateX(-50%) translateY(10px);
 }
 
 .profile-item:hover .profile-tooltip {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
+  transform: translateX(-50%) translateY(10px);
+}
+
+/* Class for tooltips that should appear above */
+.profile-tooltip.tooltip-above {
+  top: auto;
+  bottom: 100%;
+  transform: translateX(-50%) translateY(-10px);
+}
+
+.profile-item:hover .profile-tooltip.tooltip-above {
+  transform: translateX(-50%) translateY(-10px);
 }
 
 /* NY Profile Highlighting Styles */

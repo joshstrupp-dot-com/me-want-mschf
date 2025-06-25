@@ -3,18 +3,32 @@ const sentences = [
   "Let me start by apologizing...",
   "I'm sorry if this comes off as creepy. But really, you started it.",
   "Your work has inspired so much of my own.",
-  "Plus I pass by your offices all the time. It looks cool in there.",
+  "Plus I pass by your offices all the time. It looks cool in there. ",
   "No, I'm not stalking you.",
-  "I'm stalking the <img:assets/mschf-board-nobg.png> skaters.",
+  // "I'm stalking the <img:assets/mschf-board-nobg.png> skaters.",
+  "I'm stalking the skaters.",
   "...gd I wish I could skate.",
   "What I'm trying to say is:",
   "you project a desirable workplace, but list no jobs!",
-  "So, in lieu of applying, I'm simulating an interview.",
+  "So, in lieu of applying, I, Josh Strupp, am simulating an interview.",
   "Cuz if you got to know me, I think there's a 2-10% chance you'd hire me.",
 ];
 
 // ! Final Section (after chat)
-const finalSentences = ["Yes. One more thing. I've prepared a song..."];
+const finalSentences = [
+  "Yes. One more thing. I've prepared a song...",
+  "Jk.",
+  "Fr last thing: finding a job is hard — ",
+  "the odds of getting an interview are roughly 1 in 3,841.",
+  "Robo-rejectors dash hopes by the millions without explanation.",
+  "So if you can't win on merit or network… how do you stand out?",
+  "This website, perhaps. A tailored job application.", // TODO: add link to website
+  "If it gets me an interview, I can claim it works —",
+  "then release the template for anyone to use.",
+  "1:1 instead of 1:3,841.",
+  "Regardless, I'd love to be in touch. Thank you for the simulated opportunity!",
+  "Check out the ole portfolio, or reach out any time.",
+];
 
 // ! Names to highlight (New York residents)
 const nyNames = [
@@ -90,12 +104,12 @@ const secondChatMessages = [
   },
   {
     sender: "js",
-    text: "Many of us share a fondness for overpriced coffee and underresourced trash departments.",
+    text: "I live in NYC. Many of you live in NYC.",
     side: "right",
   },
   {
     sender: "js",
-    text: "Some of us share the same skills and experience. And, in the case of Johnny Thaw, the same Pornhub handle.",
+    text: "I share listed skills and experience with some. And, in the case of Johnny Thaw, the same Pornhub handle.",
     side: "right",
   },
   {
@@ -110,12 +124,12 @@ const secondChatMessages = [
   },
   {
     sender: "js",
-    text: "A handful — like this bootleg New York Times game",
+    text: "A handful — like this bootleg New York Times game.",
     side: "right",
   },
   {
     sender: "js",
-    text: "Or this CAPTCHA-style reminder that Ted Cruz should stay the f*** away from our uteri.",
+    text: "Or this stunty reminder that Ted Cruz should stay the f*** away from anyone with a uterus.",
     side: "right",
   },
   {
@@ -134,15 +148,14 @@ const secondChatMessages = [
 chatMessages.push(...secondChatMessages);
 const PLACEHOLDER_TRIGGER_TEXT =
   "I wrote a script to scrape LinkedIn. It retrieved ~80 MSCHF employees and their information.";
-const HIGHLIGHT_TRIGGER_TEXT =
-  "Many of us share a fondness for overpriced coffee and underresourced trash departments.";
+const HIGHLIGHT_TRIGGER_TEXT = "I live in NYC. Many of you live in NYC.";
 const SKILLS_TRIGGER_TEXT =
-  "Some of us share the same skills and experience. And, in the case of Johnny Thaw, the same Pornhub handle.";
+  "I share listed skills and experience with some. And, in the case of Johnny Thaw, the same Pornhub handle.";
 const LINKEDIN_TRIGGER_TEXT =
   "And some of us, for worse or for worse, are LinkedIn power users. If you have more than 1,000 connections, you're never alone.";
-const VIDEO_TRIGGER_TEXT = "A handful — like this bootleg New York Times game";
+const VIDEO_TRIGGER_TEXT = "A handful — like this bootleg New York Times game.";
 const SECOND_VIDEO_TRIGGER_TEXT =
-  "Or this CAPTCHA-style reminder that Ted Cruz should stay the f*** away from our uteri.";
+  "Or this stunty reminder that Ted Cruz should stay the f*** away from anyone with a uterus.";
 const THIRD_VIDEO_TRIGGER_TEXT =
   "And this Tinder-style game to identify fake news. I'm sorry to say, it won't help you hook up in airplane bathrooms...";
 const placeholderIndex = chatMessages.findIndex(
@@ -193,6 +206,8 @@ function hideProfileGrid() {
   hideVideoContainer();
   hideSecondVideoContainer();
   hideThirdVideoContainer();
+  hideTemplateVideo();
+  hideFastGifs();
 }
 
 // Function to highlight NY profiles
@@ -484,20 +499,39 @@ const typedText = document.getElementById("typed-text");
 let currentSentenceIndex = 0;
 let i = 0;
 let isTyping = false;
-let video = document.getElementById("screensaver-video");
+// Get all GIF elements
+let gifs = [
+  document.getElementById("gif-1"),
+  document.getElementById("gif-2"),
+  document.getElementById("gif-3"),
+  document.getElementById("gif-4"),
+  document.getElementById("gif-5"),
+  document.getElementById("gif-6"),
+];
 let passbyVideo = document.getElementById("passby-video");
+let templateVideo = document.getElementById("template-video");
+// Get fast GIF elements
+let fastGifs = [
+  document.getElementById("fast-gif-1"),
+  document.getElementById("fast-gif-2"),
+  document.getElementById("fast-gif-3"),
+];
 chatContainer = document.getElementById("chat-container");
 chatMessagesContainer = document.getElementById("chat-messages");
 let bounceInterval = null;
-let bounceState = {
-  x: 0,
-  y: 0,
-  dx: 1,
-  dy: 1,
-  speed: 1.2, // pixels per frame
-  width: 200,
-  height: 112, // will update after video loads
-};
+
+// Create bounce states for each GIF
+let gifBounceStates = gifs.map((gif, index) => ({
+  element: gif,
+  x: Math.random() * (window.innerWidth - 150),
+  y: Math.random() * (window.innerHeight - 150),
+  dx: Math.random() > 0.5 ? 1 : -1,
+  dy: Math.random() > 0.5 ? 1 : -1,
+  speed: 1.0 + Math.random() * 1.0, // random speed between 1.0 and 2.0
+  width: 150,
+  height: 150,
+}));
+
 let passbyBounceState = {
   x: 0,
   y: 0,
@@ -507,6 +541,28 @@ let passbyBounceState = {
   width: 200,
   height: 112, // will update after video loads
 };
+
+let templateBounceState = {
+  x: 0,
+  y: 0,
+  dx: 1,
+  dy: 1,
+  speed: 1.8, // slightly different speed for variety
+  width: 400,
+  height: 225, // will update after video loads
+};
+
+// Create fast bounce states for the 1:1 GIFs
+let fastGifBounceStates = fastGifs.map((gif, index) => ({
+  element: gif,
+  x: Math.random() * (window.innerWidth - 120),
+  y: Math.random() * (window.innerHeight - 120),
+  dx: Math.random() > 0.5 ? 1 : -1,
+  dy: Math.random() > 0.5 ? 1 : -1,
+  speed: 3.0 + Math.random() * 2.0, // much faster: 3.0 to 5.0
+  width: 120,
+  height: 120,
+}));
 
 // ! Main Typing Functions
 function type() {
@@ -566,23 +622,19 @@ function startTyping() {
   typedText.innerHTML = "";
   i = 0;
   type();
-  // Show screensaver if on third or fourth sentence
+  // Show GIFs if on third sentence, passby video on fourth
   if (currentSentenceIndex === 2) {
-    if (video.style.display !== "block") {
-      showScreensaver();
-    }
+    showBouncingGifs();
     // Hide passby video if it was showing
     hidePassbyScreensaver();
   } else if (currentSentenceIndex === 3) {
-    // Keep first video bouncing, show second video
-    if (video.style.display !== "block") {
-      showScreensaver();
-    }
+    // Keep GIFs bouncing, show passby video
+    showBouncingGifs();
     if (passbyVideo.style.display !== "block") {
       showPassbyScreensaver();
     }
   } else {
-    hideScreensaver();
+    hideBouncingGifs();
     hidePassbyScreensaver();
   }
 }
@@ -675,6 +727,7 @@ function createDebugDropdown() {
     z-index: 9999;
     font-family: monospace;
     font-size: 12px;
+    // display: none; /* Hide debug dropdown by default */
   `;
 
   const label = document.createElement("label");
@@ -793,7 +846,7 @@ function jumpToFinalIndex(targetIndex) {
 
   // Enter final mode and reset other states
   document.body.classList.remove("chat-active");
-  hideScreensaver();
+  hideBouncingGifs();
   hidePassbyScreensaver();
   hideProfileGrid();
 
@@ -857,30 +910,47 @@ previousSentence = function () {
   }
 };
 
-function showScreensaver() {
-  if (!video) return;
-  video.style.display = "block";
-  video.currentTime = 0;
-  video.play();
-  // Get video dimensions
-  bounceState.width = video.offsetWidth;
-  bounceState.height = video.offsetHeight;
-  // Start in a random position
-  bounceState.x = Math.random() * (window.innerWidth - bounceState.width);
-  bounceState.y = Math.random() * (window.innerHeight - bounceState.height);
-  bounceState.dx = Math.random() > 0.5 ? 1 : -1;
-  bounceState.dy = Math.random() > 0.5 ? 1 : -1;
-  moveVideo();
+function showBouncingGifs() {
+  gifs.forEach((gif, index) => {
+    if (!gif) return;
+    gif.style.display = "block";
+
+    // Reinitialize random position and direction for each show
+    gifBounceStates[index].x = Math.random() * (window.innerWidth - 150);
+    gifBounceStates[index].y = Math.random() * (window.innerHeight - 150);
+    gifBounceStates[index].dx = Math.random() > 0.5 ? 1 : -1;
+    gifBounceStates[index].dy = Math.random() > 0.5 ? 1 : -1;
+
+    // Set initial position
+    gif.style.left = gifBounceStates[index].x + "px";
+    gif.style.top = gifBounceStates[index].y + "px";
+  });
+
   if (!bounceInterval) {
-    bounceInterval = setInterval(moveVideo, 16); // ~60fps
+    bounceInterval = setInterval(moveElements, 16); // ~60fps
   }
 }
 
-function hideScreensaver() {
-  if (!video) return;
-  video.pause();
-  video.style.display = "none";
-  if (bounceInterval && passbyVideo.style.display === "none") {
+function hideBouncingGifs() {
+  gifs.forEach((gif) => {
+    if (gif) {
+      gif.style.display = "none";
+    }
+  });
+
+  // Only clear interval if all videos and fast GIFs are also hidden
+  const passbyVisible = passbyVideo && passbyVideo.style.display === "block";
+  const templateVisible =
+    templateVideo && templateVideo.style.display === "block";
+  const fastGifsVisible = fastGifs.some(
+    (gif) => gif && gif.style.display === "block"
+  );
+  if (
+    bounceInterval &&
+    !passbyVisible &&
+    !templateVisible &&
+    !fastGifsVisible
+  ) {
     clearInterval(bounceInterval);
     bounceInterval = null;
   }
@@ -902,7 +972,7 @@ function showPassbyScreensaver() {
   passbyBounceState.dx = Math.random() > 0.5 ? 1 : -1;
   passbyBounceState.dy = Math.random() > 0.5 ? 1 : -1;
   if (!bounceInterval) {
-    bounceInterval = setInterval(moveVideo, 16); // ~60fps
+    bounceInterval = setInterval(moveElements, 16); // ~60fps
   }
 }
 
@@ -910,38 +980,125 @@ function hidePassbyScreensaver() {
   if (!passbyVideo) return;
   passbyVideo.pause();
   passbyVideo.style.display = "none";
-  if (bounceInterval && video.style.display === "none") {
+  // Check if any GIFs or template video are still showing before clearing interval
+  const anyGifsVisible = gifs.some(
+    (gif) => gif && gif.style.display === "block"
+  );
+  const templateVisible =
+    templateVideo && templateVideo.style.display === "block";
+  if (bounceInterval && !anyGifsVisible && !templateVisible) {
     clearInterval(bounceInterval);
     bounceInterval = null;
   }
 }
 
-function moveVideo() {
-  // Move first video (asteroids)
-  if (video.style.display === "block") {
-    // Bounce off edges
-    if (
-      bounceState.x + bounceState.dx * bounceState.speed < 0 ||
-      bounceState.x + bounceState.width + bounceState.dx * bounceState.speed >
-        window.innerWidth
-    ) {
-      bounceState.dx *= -1;
-    }
-    if (
-      bounceState.y + bounceState.dy * bounceState.speed < 0 ||
-      bounceState.y + bounceState.height + bounceState.dy * bounceState.speed >
-        window.innerHeight
-    ) {
-      bounceState.dy *= -1;
-    }
-    bounceState.x += bounceState.dx * bounceState.speed;
-    bounceState.y += bounceState.dy * bounceState.speed;
-    video.style.left = bounceState.x + "px";
-    video.style.top = bounceState.y + "px";
+function showTemplateVideo() {
+  if (!templateVideo) return;
+  templateVideo.style.display = "block";
+  templateVideo.currentTime = 0;
+  templateVideo.play();
+  templateVideo.style.zIndex = "1500"; // bring above other content
+  // Get video dimensions
+  templateBounceState.width = templateVideo.offsetWidth;
+  templateBounceState.height = templateVideo.offsetHeight;
+  // Start in a random position
+  templateBounceState.x =
+    Math.random() * (window.innerWidth - templateBounceState.width);
+  templateBounceState.y =
+    Math.random() * (window.innerHeight - templateBounceState.height);
+  templateBounceState.dx = Math.random() > 0.5 ? 1 : -1;
+  templateBounceState.dy = Math.random() > 0.5 ? 1 : -1;
+  if (!bounceInterval) {
+    bounceInterval = setInterval(moveElements, 16); // ~60fps
   }
+}
 
-  // Move second video (passby)
-  if (passbyVideo.style.display === "block") {
+function hideTemplateVideo() {
+  if (!templateVideo) return;
+  templateVideo.pause();
+  templateVideo.style.display = "none";
+  // Check if any GIFs or passby video are still showing before clearing interval
+  const anyGifsVisible = gifs.some(
+    (gif) => gif && gif.style.display === "block"
+  );
+  const passbyVisible = passbyVideo && passbyVideo.style.display === "block";
+  const fastGifsVisible = fastGifs.some(
+    (gif) => gif && gif.style.display === "block"
+  );
+  if (bounceInterval && !anyGifsVisible && !passbyVisible && !fastGifsVisible) {
+    clearInterval(bounceInterval);
+    bounceInterval = null;
+  }
+}
+
+function showFastGifs() {
+  fastGifs.forEach((gif, index) => {
+    if (!gif) return;
+    gif.style.display = "block";
+
+    // Reinitialize random position and direction for each show
+    fastGifBounceStates[index].x = Math.random() * (window.innerWidth - 120);
+    fastGifBounceStates[index].y = Math.random() * (window.innerHeight - 120);
+    fastGifBounceStates[index].dx = Math.random() > 0.5 ? 1 : -1;
+    fastGifBounceStates[index].dy = Math.random() > 0.5 ? 1 : -1;
+
+    // Set initial position
+    gif.style.left = fastGifBounceStates[index].x + "px";
+    gif.style.top = fastGifBounceStates[index].y + "px";
+  });
+
+  if (!bounceInterval) {
+    bounceInterval = setInterval(moveElements, 16); // ~60fps
+  }
+}
+
+function hideFastGifs() {
+  fastGifs.forEach((gif) => {
+    if (gif) {
+      gif.style.display = "none";
+    }
+  });
+
+  // Check if other elements are still visible before clearing interval
+  const anyGifsVisible = gifs.some(
+    (gif) => gif && gif.style.display === "block"
+  );
+  const passbyVisible = passbyVideo && passbyVideo.style.display === "block";
+  const templateVisible =
+    templateVideo && templateVideo.style.display === "block";
+  if (bounceInterval && !anyGifsVisible && !passbyVisible && !templateVisible) {
+    clearInterval(bounceInterval);
+    bounceInterval = null;
+  }
+}
+
+function moveElements() {
+  // Move all GIFs
+  gifBounceStates.forEach((state, index) => {
+    const gif = state.element;
+    if (gif && gif.style.display === "block") {
+      // Bounce off edges
+      if (
+        state.x + state.dx * state.speed < 0 ||
+        state.x + state.width + state.dx * state.speed > window.innerWidth
+      ) {
+        state.dx *= -1;
+      }
+      if (
+        state.y + state.dy * state.speed < 0 ||
+        state.y + state.height + state.dy * state.speed > window.innerHeight
+      ) {
+        state.dy *= -1;
+      }
+      state.x += state.dx * state.speed;
+      state.y += state.dy * state.speed;
+      gif.style.left = state.x + "px";
+      gif.style.top = state.y + "px";
+    }
+  });
+
+  // Move passby video
+  if (passbyVideo && passbyVideo.style.display === "block") {
     // Bounce off edges
     if (
       passbyBounceState.x + passbyBounceState.dx * passbyBounceState.speed <
@@ -968,14 +1125,71 @@ function moveVideo() {
     passbyVideo.style.left = passbyBounceState.x + "px";
     passbyVideo.style.top = passbyBounceState.y + "px";
   }
+
+  // Move template video
+  if (templateVideo && templateVideo.style.display === "block") {
+    // Bounce off edges
+    if (
+      templateBounceState.x +
+        templateBounceState.dx * templateBounceState.speed <
+        0 ||
+      templateBounceState.x +
+        templateBounceState.width +
+        templateBounceState.dx * templateBounceState.speed >
+        window.innerWidth
+    ) {
+      templateBounceState.dx *= -1;
+    }
+    if (
+      templateBounceState.y +
+        templateBounceState.dy * templateBounceState.speed <
+        0 ||
+      templateBounceState.y +
+        templateBounceState.height +
+        templateBounceState.dy * templateBounceState.speed >
+        window.innerHeight
+    ) {
+      templateBounceState.dy *= -1;
+    }
+    templateBounceState.x += templateBounceState.dx * templateBounceState.speed;
+    templateBounceState.y += templateBounceState.dy * templateBounceState.speed;
+    templateVideo.style.left = templateBounceState.x + "px";
+    templateVideo.style.top = templateBounceState.y + "px";
+  }
+
+  // Move fast GIFs
+  fastGifBounceStates.forEach((state, index) => {
+    const gif = state.element;
+    if (gif && gif.style.display === "block") {
+      // Bounce off edges
+      if (
+        state.x + state.dx * state.speed < 0 ||
+        state.x + state.width + state.dx * state.speed > window.innerWidth
+      ) {
+        state.dx *= -1;
+      }
+      if (
+        state.y + state.dy * state.speed < 0 ||
+        state.y + state.height + state.dy * state.speed > window.innerHeight
+      ) {
+        state.dy *= -1;
+      }
+      state.x += state.dx * state.speed;
+      state.y += state.dy * state.speed;
+      gif.style.left = state.x + "px";
+      gif.style.top = state.y + "px";
+    }
+  });
 }
 
 // ! Chat Functions
 function transitionToChat() {
   // Hide all terminal elements
   document.body.classList.add("chat-active");
-  hideScreensaver();
+  hideBouncingGifs();
   hidePassbyScreensaver();
+  hideTemplateVideo();
+  hideFastGifs();
   hideProfileGrid();
   gridShown = false;
 
@@ -1265,6 +1479,20 @@ function loadProfileGrid() {
               tooltip.className = "profile-tooltip";
               tooltip.innerText = tooltipParts.join("\n");
 
+              // Add hover event listeners to position tooltip dynamically
+              item.addEventListener("mouseenter", function () {
+                const rect = item.getBoundingClientRect();
+                const tooltipHeight = 80; // Approximate tooltip height
+                const topSpace = rect.top;
+
+                // If there's not enough space above (less than tooltip height + buffer)
+                if (topSpace < tooltipHeight + 20) {
+                  tooltip.classList.remove("tooltip-above");
+                } else {
+                  tooltip.classList.add("tooltip-above");
+                }
+              });
+
               item.appendChild(img);
               item.appendChild(tooltip);
               grid.appendChild(item);
@@ -1386,7 +1614,7 @@ function jumpToChatIndex(targetIndex) {
 
   // Enter chat mode and reset state
   document.body.classList.add("chat-active");
-  hideScreensaver();
+  hideBouncingGifs();
   hidePassbyScreensaver();
   hideProfileGrid();
 
@@ -1481,13 +1709,18 @@ function jumpToChatIndex(targetIndex) {
 function transitionToFinal() {
   // Hide chat elements and show terminal elements
   document.body.classList.remove("chat-active");
-  hideScreensaver();
+  hideBouncingGifs();
   hidePassbyScreensaver();
+  hideTemplateVideo();
+  hideFastGifs();
   hideProfileGrid();
 
   if (chatContainer) {
     chatContainer.classList.remove("active");
   }
+
+  // Clear the terminal text immediately to avoid showing old content
+  typedText.innerHTML = "";
 
   chatMode = false;
   finalMode = true;
@@ -1509,6 +1742,20 @@ function startFinalTyping() {
   isTyping = true;
   typedText.innerHTML = "";
   i = 0;
+  // Hide CTA until we know we're on the last sentence and finished typing
+  hideFinalCTA();
+  // Show template video if on the "template" sentence (index 8)
+  if (currentFinalIndex === 8) {
+    showTemplateVideo();
+  } else {
+    hideTemplateVideo();
+  }
+  // Show fast GIFs if on the "1:1 instead of 1:3,841." sentence (index 9)
+  if (currentFinalIndex === 9) {
+    showFastGifs();
+  } else {
+    hideFastGifs();
+  }
   typeFinal();
 }
 
@@ -1541,10 +1788,21 @@ function typeFinal() {
       }
     }
 
-    // Normal character typing
-    const textNode = document.createTextNode(
-      finalSentences[currentFinalIndex][i++]
-    );
+    // Handle generic HTML tags (e.g., <a>, <br/>) so they render correctly
+    if (currentText[i] === "<") {
+      const tagEnd = currentText.indexOf(">", i);
+      if (tagEnd !== -1) {
+        // Append the whole tag at once using innerHTML so the browser parses it
+        typedText.innerHTML =
+          typedText.innerHTML + currentText.substring(i, tagEnd + 1);
+        i = tagEnd + 1;
+        setTimeout(typeFinal, 40);
+        return;
+      }
+    }
+
+    // Normal character typing (non-HTML)
+    const textNode = document.createTextNode(currentText[i++]);
     typedText.appendChild(textNode);
 
     // Check if we just typed a period followed by a space (sentence ending)
@@ -1552,14 +1810,19 @@ function typeFinal() {
     const nextChar = currentText[i];
 
     if (justTyped === "." && nextChar === " ") {
-      // Add a longer pause for sentence breaks
-      setTimeout(typeFinal, 250);
+      setTimeout(typeFinal, 250); // Longer pause at sentence breaks
     } else {
-      // Normal typing speed
       setTimeout(typeFinal, 40);
     }
   } else {
     isTyping = false;
+
+    // If we're on the last final sentence, reveal CTA links
+    if (currentFinalIndex === finalSentences.length - 1) {
+      showFinalCTA();
+    } else {
+      hideFinalCTA();
+    }
   }
 }
 
@@ -1586,6 +1849,7 @@ function previousFinalSentence() {
   } else {
     // Return to chat mode at the last message
     finalMode = false;
+    hideFinalCTA();
     chatMode = true;
     document.body.classList.add("chat-active");
 
@@ -1626,3 +1890,50 @@ const linkedinNames = [
   "jesse lane",
   "Niek Dekker r",
 ];
+
+// ! Final CTA (Portfolio & Email)
+function showFinalCTA() {
+  // Avoid duplicating
+  let cta = document.getElementById("final-cta-container");
+  if (!cta) {
+    cta = document.createElement("div");
+    cta.id = "final-cta-container";
+    cta.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1500;
+      display: flex;
+      flex-direction: column;
+      gap: 10em;
+      font-family: monospace;
+      text-align: center;
+    `;
+
+    const portfolioLink = document.createElement("a");
+    portfolioLink.href = "https://www.joshstrupp.com/";
+    portfolioLink.target = "_blank";
+    portfolioLink.textContent = "Portfolio";
+    portfolioLink.style.cssText =
+      "color:#006400;text-decoration:underline; font-size:2em; font-weight:bold;";
+
+    const emailLink = document.createElement("a");
+    emailLink.href = "mailto:howdy@joshstrupp.com";
+    emailLink.textContent = "howdy@joshstrupp.com";
+    emailLink.style.cssText =
+      "color:#006400;text-decoration:underline; font-size:2em; font-weight:bold;";
+
+    cta.appendChild(portfolioLink);
+    cta.appendChild(emailLink);
+    document.body.appendChild(cta);
+  }
+  cta.style.display = "flex";
+}
+
+function hideFinalCTA() {
+  const cta = document.getElementById("final-cta-container");
+  if (cta) {
+    cta.style.display = "none";
+  }
+}
