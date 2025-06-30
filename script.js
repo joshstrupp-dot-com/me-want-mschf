@@ -22,12 +22,12 @@ const finalSentences = [
   "the odds of getting an interview are roughly 1 in 3,841.",
   "Robo-rejectors dash hopes by the millions without explanation.",
   "So if you can't win on merit or network… how do you stand out?",
-  "This website, perhaps. A tailored job application.", // TODO: add link to website
+  "This website, perhaps. A tailored job application.",
   "If it gets me an interview, I can claim it works —",
   "then release the template for anyone to use.",
   "1:1 instead of 1:3,841.",
-  "Regardless, I'd love to be in touch—",
-  "—for freelance/contract CD, copy, data, or ux design/dev roles.",
+  "Regardless, I'd love to be in touch —",
+  "for PT/FT/contract CD, copy, data, or ux design/dev roles.",
   "Thank you for the simulated opportunity!",
   "Check out the ole portfolio, or reach out any time.",
 ];
@@ -511,6 +511,7 @@ let gifs = [
   document.getElementById("gif-6"),
 ];
 let passbyVideo = document.getElementById("passby-video");
+let skaterVideo = document.getElementById("skater-video");
 let templateVideo = document.getElementById("template-video");
 // Get fast GIF elements
 let fastGifs = [
@@ -540,6 +541,16 @@ let passbyBounceState = {
   dx: 1,
   dy: 1,
   speed: 1.5, // slightly different speed for variety
+  width: 200,
+  height: 112, // will update after video loads
+};
+
+let skaterBounceState = {
+  x: 0,
+  y: 0,
+  dx: 1,
+  dy: 1,
+  speed: 1.7, // slightly different speed for variety
   width: 200,
   height: 112, // will update after video loads
 };
@@ -624,20 +635,30 @@ function startTyping() {
   typedText.innerHTML = "";
   i = 0;
   type();
-  // Show GIFs if on third sentence, passby video on fourth
+  // Show GIFs for work sentence, passby video only for office sentence, skater video only for skater sentence
   if (currentSentenceIndex === 2) {
     showBouncingGifs();
-    // Hide passby video if it was showing
+    // Hide videos if they were showing
     hidePassbyScreensaver();
+    hideSkaterScreensaver();
   } else if (currentSentenceIndex === 3) {
-    // Keep GIFs bouncing, show passby video
-    showBouncingGifs();
+    // Hide GIFs, show only passby video
+    hideBouncingGifs();
     if (passbyVideo.style.display !== "block") {
       showPassbyScreensaver();
     }
+    hideSkaterScreensaver();
+  } else if (currentSentenceIndex === 5) {
+    // Hide GIFs, show only skater video
+    hideBouncingGifs();
+    if (skaterVideo.style.display !== "block") {
+      showSkaterScreensaver();
+    }
+    hidePassbyScreensaver();
   } else {
     hideBouncingGifs();
     hidePassbyScreensaver();
+    hideSkaterScreensaver();
   }
 }
 
@@ -942,6 +963,7 @@ function hideBouncingGifs() {
 
   // Only clear interval if all videos and fast GIFs are also hidden
   const passbyVisible = passbyVideo && passbyVideo.style.display === "block";
+  const skaterVisible = skaterVideo && skaterVideo.style.display === "block";
   const templateVisible =
     templateVideo && templateVideo.style.display === "block";
   const fastGifsVisible = fastGifs.some(
@@ -950,6 +972,7 @@ function hideBouncingGifs() {
   if (
     bounceInterval &&
     !passbyVisible &&
+    !skaterVisible &&
     !templateVisible &&
     !fastGifsVisible
   ) {
@@ -982,13 +1005,51 @@ function hidePassbyScreensaver() {
   if (!passbyVideo) return;
   passbyVideo.pause();
   passbyVideo.style.display = "none";
-  // Check if any GIFs or template video are still showing before clearing interval
+  // Check if any GIFs, skater video, or template video are still showing before clearing interval
   const anyGifsVisible = gifs.some(
     (gif) => gif && gif.style.display === "block"
   );
+  const skaterVisible = skaterVideo && skaterVideo.style.display === "block";
   const templateVisible =
     templateVideo && templateVideo.style.display === "block";
-  if (bounceInterval && !anyGifsVisible && !templateVisible) {
+  if (bounceInterval && !anyGifsVisible && !skaterVisible && !templateVisible) {
+    clearInterval(bounceInterval);
+    bounceInterval = null;
+  }
+}
+
+function showSkaterScreensaver() {
+  if (!skaterVideo) return;
+  skaterVideo.style.display = "block";
+  skaterVideo.currentTime = 0;
+  skaterVideo.play();
+  // Get video dimensions
+  skaterBounceState.width = skaterVideo.offsetWidth;
+  skaterBounceState.height = skaterVideo.offsetHeight;
+  // Start in a random position (different from other videos)
+  skaterBounceState.x =
+    Math.random() * (window.innerWidth - skaterBounceState.width);
+  skaterBounceState.y =
+    Math.random() * (window.innerHeight - skaterBounceState.height);
+  skaterBounceState.dx = Math.random() > 0.5 ? 1 : -1;
+  skaterBounceState.dy = Math.random() > 0.5 ? 1 : -1;
+  if (!bounceInterval) {
+    bounceInterval = setInterval(moveElements, 16); // ~60fps
+  }
+}
+
+function hideSkaterScreensaver() {
+  if (!skaterVideo) return;
+  skaterVideo.pause();
+  skaterVideo.style.display = "none";
+  // Check if any GIFs, passby video, or template video are still showing before clearing interval
+  const anyGifsVisible = gifs.some(
+    (gif) => gif && gif.style.display === "block"
+  );
+  const passbyVisible = passbyVideo && passbyVideo.style.display === "block";
+  const templateVisible =
+    templateVideo && templateVideo.style.display === "block";
+  if (bounceInterval && !anyGifsVisible && !passbyVisible && !templateVisible) {
     clearInterval(bounceInterval);
     bounceInterval = null;
   }
@@ -1019,15 +1080,22 @@ function hideTemplateVideo() {
   if (!templateVideo) return;
   templateVideo.pause();
   templateVideo.style.display = "none";
-  // Check if any GIFs or passby video are still showing before clearing interval
+  // Check if any GIFs, passby video, or skater video are still showing before clearing interval
   const anyGifsVisible = gifs.some(
     (gif) => gif && gif.style.display === "block"
   );
   const passbyVisible = passbyVideo && passbyVideo.style.display === "block";
+  const skaterVisible = skaterVideo && skaterVideo.style.display === "block";
   const fastGifsVisible = fastGifs.some(
     (gif) => gif && gif.style.display === "block"
   );
-  if (bounceInterval && !anyGifsVisible && !passbyVisible && !fastGifsVisible) {
+  if (
+    bounceInterval &&
+    !anyGifsVisible &&
+    !passbyVisible &&
+    !skaterVisible &&
+    !fastGifsVisible
+  ) {
     clearInterval(bounceInterval);
     bounceInterval = null;
   }
@@ -1066,9 +1134,16 @@ function hideFastGifs() {
     (gif) => gif && gif.style.display === "block"
   );
   const passbyVisible = passbyVideo && passbyVideo.style.display === "block";
+  const skaterVisible = skaterVideo && skaterVideo.style.display === "block";
   const templateVisible =
     templateVideo && templateVideo.style.display === "block";
-  if (bounceInterval && !anyGifsVisible && !passbyVisible && !templateVisible) {
+  if (
+    bounceInterval &&
+    !anyGifsVisible &&
+    !passbyVisible &&
+    !skaterVisible &&
+    !templateVisible
+  ) {
     clearInterval(bounceInterval);
     bounceInterval = null;
   }
@@ -1126,6 +1201,35 @@ function moveElements() {
     passbyBounceState.y += passbyBounceState.dy * passbyBounceState.speed;
     passbyVideo.style.left = passbyBounceState.x + "px";
     passbyVideo.style.top = passbyBounceState.y + "px";
+  }
+
+  // Move skater video
+  if (skaterVideo && skaterVideo.style.display === "block") {
+    // Bounce off edges
+    if (
+      skaterBounceState.x + skaterBounceState.dx * skaterBounceState.speed <
+        0 ||
+      skaterBounceState.x +
+        skaterBounceState.width +
+        skaterBounceState.dx * skaterBounceState.speed >
+        window.innerWidth
+    ) {
+      skaterBounceState.dx *= -1;
+    }
+    if (
+      skaterBounceState.y + skaterBounceState.dy * skaterBounceState.speed <
+        0 ||
+      skaterBounceState.y +
+        skaterBounceState.height +
+        skaterBounceState.dy * skaterBounceState.speed >
+        window.innerHeight
+    ) {
+      skaterBounceState.dy *= -1;
+    }
+    skaterBounceState.x += skaterBounceState.dx * skaterBounceState.speed;
+    skaterBounceState.y += skaterBounceState.dy * skaterBounceState.speed;
+    skaterVideo.style.left = skaterBounceState.x + "px";
+    skaterVideo.style.top = skaterBounceState.y + "px";
   }
 
   // Move template video
@@ -1190,6 +1294,7 @@ function transitionToChat() {
   document.body.classList.add("chat-active");
   hideBouncingGifs();
   hidePassbyScreensaver();
+  hideSkaterScreensaver();
   hideTemplateVideo();
   hideFastGifs();
   hideProfileGrid();
@@ -1741,6 +1846,7 @@ function transitionToFinal() {
   document.body.classList.remove("chat-active");
   hideBouncingGifs();
   hidePassbyScreensaver();
+  hideSkaterScreensaver();
   hideTemplateVideo();
   hideFastGifs();
   hideProfileGrid();
