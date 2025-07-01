@@ -690,6 +690,7 @@ document.addEventListener("keydown", function (event) {
       case "ArrowRight":
       case "ArrowDown":
       case "Enter":
+      case " ":
         event.preventDefault();
         nextChatMessage();
         break;
@@ -706,6 +707,7 @@ document.addEventListener("keydown", function (event) {
       case "ArrowRight":
       case "ArrowDown":
       case "Enter":
+      case " ":
         event.preventDefault();
         nextFinalSentence();
         break;
@@ -722,6 +724,7 @@ document.addEventListener("keydown", function (event) {
       case "ArrowRight":
       case "ArrowDown":
       case "Enter":
+      case " ":
         event.preventDefault();
         nextSentence();
         break;
