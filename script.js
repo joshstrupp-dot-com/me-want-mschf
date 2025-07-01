@@ -750,7 +750,7 @@ function createDebugDropdown() {
     z-index: 9999;
     font-family: monospace;
     font-size: 12px;
-    // display: none; /* Hide debug dropdown by default */
+    display: none; /* Hide debug dropdown by default */
   `;
 
   const label = document.createElement("label");
