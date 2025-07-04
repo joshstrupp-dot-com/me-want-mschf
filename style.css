@@ -590,3 +590,55 @@ body {
     box-shadow: 0 4px 20px rgba(255, 107, 157, 0.6);
   }
 }
+
+/* Small Screen Message */
+.small-screen-message {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  z-index: 9999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New",
+    monospace;
+  font-size: 18px;
+  color: black;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Show message and hide everything else on small screens */
+@media (max-width: 699px) {
+  .small-screen-message {
+    display: flex;
+  }
+
+  .terminal-container,
+  .chat-container,
+  .profile-grid,
+  #gif-1,
+  #gif-2,
+  #gif-3,
+  #gif-4,
+  #gif-5,
+  #gif-6,
+  #passby-video,
+  #skater-video,
+  #template-video,
+  #fast-gif-1,
+  #fast-gif-2,
+  #fast-gif-3,
+  #headlines-video-container,
+  #c4c-video-container,
+  #fake-news-video-container,
+  #final-cta-container,
+  #debug-container {
+    display: none !important;
+  }
+}

@@ -738,6 +738,76 @@ document.addEventListener("keydown", function (event) {
   }
 });
 
+// ! Touch Controls for Mobile
+let touchStartX = 0;
+let touchStartY = 0;
+let touchEndX = 0;
+let touchEndY = 0;
+
+document.addEventListener("touchstart", function (event) {
+  touchStartX = event.touches[0].clientX;
+  touchStartY = event.touches[0].clientY;
+});
+
+document.addEventListener("touchend", function (event) {
+  touchEndX = event.changedTouches[0].clientX;
+  touchEndY = event.changedTouches[0].clientY;
+
+  const deltaX = touchEndX - touchStartX;
+  const deltaY = touchEndY - touchStartY;
+  const minSwipeDistance = 50; // Minimum distance for a swipe
+
+  // Check if it's a swipe or just a tap
+  if (
+    Math.abs(deltaX) < minSwipeDistance &&
+    Math.abs(deltaY) < minSwipeDistance
+  ) {
+    // It's a tap - advance to next
+    handleTouchAdvance();
+  } else {
+    // It's a swipe - check direction
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      // Horizontal swipe
+      if (deltaX > minSwipeDistance) {
+        // Swipe right - advance
+        handleTouchAdvance();
+      } else if (deltaX < -minSwipeDistance) {
+        // Swipe left - go back
+        handleTouchGoBack();
+      }
+    } else {
+      // Vertical swipe
+      if (deltaY < -minSwipeDistance) {
+        // Swipe up - advance
+        handleTouchAdvance();
+      } else if (deltaY > minSwipeDistance) {
+        // Swipe down - go back
+        handleTouchGoBack();
+      }
+    }
+  }
+});
+
+function handleTouchAdvance() {
+  if (chatMode) {
+    nextChatMessage();
+  } else if (finalMode) {
+    nextFinalSentence();
+  } else {
+    nextSentence();
+  }
+}
+
+function handleTouchGoBack() {
+  if (chatMode) {
+    previousChatMessage();
+  } else if (finalMode) {
+    previousFinalSentence();
+  } else {
+    previousSentence();
+  }
+}
+
 // ! Temporary Debug Dropdown
 // Create debug dropdown for sentence navigation
 function createDebugDropdown() {
